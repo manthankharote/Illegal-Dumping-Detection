@@ -1,64 +1,20 @@
+name: illegal-dumping-env
+
 environment:
-  name: "GarbageAndDumpingEnv"
-  description: "An OpenEnv-compatible environment for municipal garbage detection, illegal dumping analysis, and risk prediction."
-  version: "1.0.0"
+  type: python
 
-# Application Config / Variables
-config:
-  API_BASE_URL: "http://localhost:8000/api" # Placeholder for backend API endpoint
-  MODEL_NAME: "best.pt"                    # Placeholder for YOLO model weights lookup
+entrypoint:
+  command: uvicorn main:app --host 0.0.0.0 --port 7860
 
-# Environment Tasks
+endpoints:
+  reset: /reset
+  step: /step
+  state: /state
+
 tasks:
-  - id: "garbage_detection"
-    difficulty: "easy"
-    description: "Detect if any static garbage is present in the given observation."
-    
-  - id: "dumping_detection"
-    difficulty: "medium"
-    description: "Identify active or recent illegal dumping activities taking place."
-    
-  - id: "risk_prediction"
-    difficulty: "hard"
-    description: "Predict the likelihood of future violations based on scene context and historical data."
-
-# Environment I/O Definitions
-spaces:
-  # Action mapping (0, 1, 2)
-  action_space:
-    type: "Discrete"
-    n: 3
-    mapping:
-      0: "ignore"
-      1: "detect_garbage"
-      2: "alert"
-
-  # Observation structure logic (JSON based representation of our environment)
-  observation_space:
-    type: "JSON"
-    schema:
-      type: "object"
-      properties:
-        image_base64:
-          type: "string"
-          description: "Base64 encoded frame from camera"
-        ground_truth:
-          type: "object"
-          properties:
-            has_garbage: 
-              type: "boolean"
-            is_dumping: 
-              type: "boolean"
-            high_risk: 
-              type: "boolean"
-        ai_detections:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              label: 
-                type: "string"
-              confidence: 
-                type: "number"
-              bbox: 
-                type: "array"
+  - id: task_easy
+    description: Detect garbage presence
+  - id: task_medium
+    description: Detect illegal dumping
+  - id: task_hard
+    description: Predict environmental risk
