@@ -1,37 +1,35 @@
-from .detector import GarbageDetector
-
 class GarbageDetectionEnv:
     def __init__(self):
-        self.detector = GarbageDetector()
         self.current_step = 0
         self.current_state = {}
 
     def reset(self):
         self.current_step = 0
-
-        # initialize full state (IMPORTANT)
         self.current_state = {
-            "step": self.current_step,
+            "step": 0,
             "garbage": False,
             "dumping": False,
             "risk": False
         }
-
         return self.current_state
 
     def state(self):
         return self.current_state
 
     def step(self, action):
-        pred = self.detector.detect()
-
-        garbage = bool(pred.get("garbage", False))
-        dumping = bool(pred.get("dumping", False))
-        risk = bool(pred.get("risk", False))
-
-        # simulate variation
-        if self.current_step == 2:
+        # PURE SIMULATION (NO detector call)
+        if self.current_step == 0:
+            garbage = True
+            dumping = False
+            risk = False
+        elif self.current_step == 1:
             garbage = False
+            dumping = True
+            risk = False
+        else:
+            garbage = False
+            dumping = False
+            risk = True
 
         reward = 0.0
         if action == 1 and garbage:
@@ -43,7 +41,6 @@ class GarbageDetectionEnv:
 
         self.current_step += 1
 
-        # update full state (IMPORTANT)
         self.current_state = {
             "step": self.current_step,
             "garbage": garbage,
@@ -51,6 +48,4 @@ class GarbageDetectionEnv:
             "risk": risk
         }
 
-        done = False  # IMPORTANT: don't end immediately
-
-        return self.current_state, float(reward), done, {}
+        return self.current_state, float(reward), False, {}
