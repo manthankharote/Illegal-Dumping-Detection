@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import uvicorn
 from ai_service.garbage_env import GarbageDetectionEnv
 
 app = FastAPI()
@@ -22,3 +23,11 @@ def step_env(req: dict):
 @app.get("/state")
 def get_state():
     return {"state": env.state()}
+
+# 🔥 REQUIRED MAIN FUNCTION
+def main():
+    uvicorn.run(app, host="0.0.0.0", port=7860)
+
+# 🔥 REQUIRED ENTRYPOINT
+if __name__ == "__main__":
+    main()
