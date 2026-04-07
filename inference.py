@@ -9,19 +9,18 @@ logging.getLogger().setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
 
 # Add ai-service to sys.path
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai-service'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai_service'))
 
 # Suppressing initial import/model prints and stderr to ensure strict log format
 with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
-    from garbage_env import GarbageDetectionEnv
+    from ai_service.garbage_env import GarbageDetectionEnv
 
 def main():
     print("[START]")
     
     # Supressing model loading initialization logs
     with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
-        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai-service', 'best.pt')
-        env = GarbageDetectionEnv(model_path=model_path)
+        env = GarbageDetectionEnv()
         env.reset()
         
     # We will run 3 tasks with dummy actions: 

@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from detector import GarbageDetector
+from .detector import GarbageDetector
 
 class GarbageDetectionEnv:
     """
@@ -69,21 +69,6 @@ class GarbageDetectionEnv:
         }
         
     def step(self, action):
-        """
-        Advances the environment by one step.
-        
-        Args:
-            action (int): 
-                0 = ignore
-                1 = detect garbage
-                2 = alert
-                
-        Returns:
-            next_state (dict): The state JSON after the action is taken.
-            reward (float): The reward achieved perfectly bounded between 0.0 and 1.0.
-            done (bool): Whether the episode has finished.
-            info (dict): Additional diagnostic information including specific task score breakdown.
-        """
         if self.current_step >= self.max_steps:
             return self.state(), 0.0, True, {"msg": "Episode finished"}
             
@@ -92,58 +77,31 @@ class GarbageDetectionEnv:
             "tasks_evaluated": self.tasks,
         }
         
-        # 1. Deterministic Call to AI Service (Garbage Detection Logic)
-        ai_pred = self.detector.detect_frame(self.current_state)
-        self.latest_ai_detections = ai_pred["detections"]
-        info["ai_results"] = ai_pred
+        # simulated deterministic detection
+        pred = self.detector.detect()
+        garbage = pred["garbage"]
+        dumping = pred["dumping"]
+        risk = pred["risk"]
         
-        # Ground truths for deterministic evaluation
-        has_garbage = self.current_ground_truth.get("has_garbage", False)
-        is_dumping = self.current_ground_truth.get("is_dumping", False)
-        high_risk = self.current_ground_truth.get("high_risk", False)
+        # update state for info
+        info["ai_results"] = pred
         
-        # 2. Reward Logic based on simulation of tasks (Easy -> Medium -> Hard)
-        task_scores = {
-            "garbage_detection": 0.0,
-            "dumping_detection": 0.0,
-            "risk_prediction": 0.0
-        }
-
-        # Task 1: Garbage Detection (Easy)
-        # Target: Has garbage been accurately flagged?
-        if has_garbage:
-            task_scores["garbage_detection"] = 1.0 if action in [1, 2] else 0.0
-        else:
-            task_scores["garbage_detection"] = 1.0 if action == 0 else 0.0
-
-        # Task 2: Dumping Detection (Medium)
-        # Target: Has the system escalated appropriately for active dumping?
-        if is_dumping:
-            task_scores["dumping_detection"] = 1.0 if action == 2 else 0.0
-        else:
-            # If no dumping, action 2 is only justified if there is high risk
-            task_scores["dumping_detection"] = 1.0 if (action != 2 or high_risk) else 0.0
-
-        # Task 3: Risk Prediction (Hard)
-        # Target: Has the system recognized high risk variables without explicitly needing dumping?
-        if high_risk:
-            task_scores["risk_prediction"] = 1.0 if action == 2 else 0.0
-        else:
-            # If no high risk, action 2 is only justified if there is active dumping
-            task_scores["risk_prediction"] = 1.0 if (action != 2 or is_dumping) else 0.0
-
-        # Overall deterministic reward perfectly scaled between 0.0 and 1.0
-        reward = sum(task_scores.values()) / 3.0
-        info["task_scores"] = task_scores
-
-        # 3. Advance step counters
+        reward = 0.0
+        
+        # simplified reward logic
+        if action == 1 and garbage:
+            reward = 1.0
+        elif action == 2 and dumping:
+            reward = 1.0
+        elif action == 1 and risk:
+            reward = 0.5
+            
+        # Overall deterministic reward
         self.current_step += 1
         done = self.current_step >= self.max_steps
         
-        # 4. Grab state JSON *after* AI prediction to cleanly populate state
         next_state = self.state()
         
-        # 5. Transition to the next scenario deterministically for the next iteration silently
         if not done:
             self._load_next_scenario()
             
