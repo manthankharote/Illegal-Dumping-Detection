@@ -1,26 +1,37 @@
-import json
 from .detector import GarbageDetector
 
 class GarbageDetectionEnv:
     def __init__(self):
         self.detector = GarbageDetector()
         self.current_step = 0
+        self.current_state = {}
 
     def reset(self):
         self.current_step = 0
-        return self.state()
+
+        # initialize full state (IMPORTANT)
+        self.current_state = {
+            "step": self.current_step,
+            "garbage": False,
+            "dumping": False,
+            "risk": False
+        }
+
+        return self.current_state
 
     def state(self):
-        return {"step": self.current_step}
+        return self.current_state
 
     def step(self, action):
         pred = self.detector.detect()
-        garbage = pred.get("garbage", False)
-        dumping = pred.get("dumping", False)
-        risk = pred.get("risk", False)
 
+        garbage = bool(pred.get("garbage", False))
+        dumping = bool(pred.get("dumping", False))
+        risk = bool(pred.get("risk", False))
+
+        # simulate variation
         if self.current_step == 2:
-            garbage = False  # Allows the "risk" fallback clause to be tested on the 3rd step
+            garbage = False
 
         reward = 0.0
         if action == 1 and garbage:
@@ -31,4 +42,15 @@ class GarbageDetectionEnv:
             reward = 0.5
 
         self.current_step += 1
-        return self.state(), float(reward), True, {"action": action, "ai_results": pred}
+
+        # update full state (IMPORTANT)
+        self.current_state = {
+            "step": self.current_step,
+            "garbage": garbage,
+            "dumping": dumping,
+            "risk": risk
+        }
+
+        done = False  # IMPORTANT: don't end immediately
+
+        return self.current_state, float(reward), done, {}
