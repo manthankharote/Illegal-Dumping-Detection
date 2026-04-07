@@ -11,7 +11,8 @@ class ActionRequest(BaseModel):
 
 @app.post("/reset")
 def reset_env():
-    return env.reset()
+    state = env.reset()
+    return {"state": state}
 
 @app.post("/step")
 def step_env(req: ActionRequest):
@@ -25,4 +26,4 @@ def step_env(req: ActionRequest):
 
 @app.get("/state")
 def get_state():
-    return env.state()
+    return {"state": env.state()}
