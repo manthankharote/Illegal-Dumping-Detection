@@ -1,14 +1,4 @@
-openenv>=0.2.3
-fastapi==0.110.0
-uvicorn[standard]==0.29.0
-requests>=2.31.0
-
-# Minimal ML & Vision dependencies
-numpy>=1.26.4
-ultralytics==8.1.47
-opencv-python-headless>=4.9.0.80
-Pillow>=10.2.0
-
-# API Utility dependencies
-python-multipart==0.0.9
-python-dotenv==1.0.1
+openenv-core==0.2.3
+fastapi
+uvicorn
+requests
