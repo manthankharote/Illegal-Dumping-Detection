@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from ai_service.garbage_env import GarbageDetectionEnv
 
 app = FastAPI()
-
 env = GarbageDetectionEnv()
 
 class ActionRequest(BaseModel):
@@ -23,6 +22,6 @@ def step_env(req: ActionRequest):
         "info": info
     }
 
-@app.get("/state")
-def get_state():
-    return {"state": env.state()}
+@app.get("/")
+def root():
+    return {"message": "API running"}  # IMPORTANT for HF
