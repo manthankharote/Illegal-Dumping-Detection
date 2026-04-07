@@ -1,0 +1,12 @@
+[project]
+name = "illegal-dumping-env"
+version = "0.1.0"
+description = "Deterministic RL environment for illegal dumping detection"
+authors = [
+    { name="Manthan", email="your@email.com" }
+]
+dependencies = []
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
