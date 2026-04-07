@@ -1,11 +1,5 @@
-"""
-detector.py — Simulated Garbage Detection
-==========================================================
-Deterministic simulated detector for OpenEnv.
-"""
-
 class GarbageDetector:
-    def __init__(self, model_path=None):
+    def __init__(self):
         pass
 
     def detect(self):
