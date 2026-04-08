@@ -10,7 +10,7 @@ class GarbageDetectionEnv:
         return {"step": self.current_step}
 
     def step(self, action):
-        # deterministic scenarios
+        # 🔥 Deterministic scenarios (3 tasks)
         if self.current_step == 0:
             garbage, dumping, risk = True, False, False
         elif self.current_step == 1:
@@ -18,19 +18,12 @@ class GarbageDetectionEnv:
         else:
             garbage, dumping, risk = False, False, True
 
-        # ✅ ALWAYS VALID SCORES (0 < x < 1)
-        task_easy = 0.3
-        task_medium = 0.4
-        task_hard = 0.5
+        # ✅ Task scores (STRICTLY between 0 and 1)
+        task_easy = 0.9 if garbage and action == 1 else 0.3
+        task_medium = 0.8 if dumping and action == 2 else 0.4
+        task_hard = 0.7 if risk and action == 1 else 0.5
 
-        if garbage and action == 1:
-            task_easy = 0.9
-        if dumping and action == 2:
-            task_medium = 0.8
-        if risk and action == 1:
-            task_hard = 0.7
-
-        # final reward (also safe)
+        # Final reward
         reward = (task_easy + task_medium + task_hard) / 3
 
         self.current_step += 1
@@ -45,10 +38,10 @@ class GarbageDetectionEnv:
             float(reward),
             False,
             {
-                "task_scores": {
-                    "task_easy": float(task_easy),
-                    "task_medium": float(task_medium),
-                    "task_hard": float(task_hard)
-                }
+                "tasks": [
+                    {"name": "task_easy", "score": float(task_easy)},
+                    {"name": "task_medium", "score": float(task_medium)},
+                    {"name": "task_hard", "score": float(task_hard)}
+                ]
             }
         )
