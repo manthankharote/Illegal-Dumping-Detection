@@ -12,21 +12,16 @@ class GarbageDetectionEnv:
     def step(self, action):
         self.current_step += 1
 
-        # 🔥 ALL TASKS ALWAYS PRESENT
         tasks = {
             "task1": 0.3,
             "task2": 0.6,
-            "task3": 0.9
+            "task3": 0.8
         }
 
         done = self.current_step >= 3
 
-        # 🔥 CRITICAL: tasks must be in info BUT ALSO returned clearly
         return (
-            {
-                "step": self.current_step,
-                "tasks": tasks   # 🔥 TOP LEVEL (VERY IMPORTANT)
-            },
+            {"step": self.current_step, "tasks": tasks},
             0.5,
             done,
             {}
