@@ -11,13 +11,19 @@ tasks:
     description: Detect garbage
     grader:
       type: numeric
+      min: 0.0
+      max: 1.0
 
   - id: task_medium
     description: Detect dumping
     grader:
       type: numeric
+      min: 0.0
+      max: 1.0
 
   - id: task_hard
     description: Predict risk
     grader:
       type: numeric
+      min: 0.0
+      max: 1.0
