@@ -30,3 +30,4 @@ class GarbageDetectionEnv:
                 "graders": self.tasks
             }
         )
+        
