@@ -1,18 +1,29 @@
 from fastapi import FastAPI
-import subprocess
+from pydantic import BaseModel
+from ai_service.garbage_env import GarbageDetectionEnv
 
 app = FastAPI()
 
+env = GarbageDetectionEnv()
+
+class ActionRequest(BaseModel):
+    action: int
+
 @app.get("/")
-def home():
+def root():
     return {"message": "API running"}
 
 @app.post("/reset")
 def reset():
-    try:
-        output = subprocess.check_output(["python", "inference.py"], text=True)
-        print(output)
-    except Exception as e:
-        print("Error:", e)
+    return env.reset()
 
-    return {"status": "reset done"}
+@app.post("/step")
+def step(req: ActionRequest):
+    state, reward, done, info = env.step(req.action)
+
+    return {
+        "state": state,
+        "reward": reward,
+        "done": done,
+        "tasks": info.get("tasks", {})
+    }
