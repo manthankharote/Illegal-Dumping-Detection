@@ -17,7 +17,7 @@ class GarbageDetectionEnv:
         return self.current_state
 
     def step(self, action):
-        # PURE SIMULATION (NO detector call)
+        # 🔥 Deterministic simulation (NO detector)
         if self.current_step == 0:
             garbage = True
             dumping = False
@@ -31,11 +31,13 @@ class GarbageDetectionEnv:
             dumping = False
             risk = True
 
-        reward = 0.0
+        # Reward strictly between (0,1)
+        reward = 0.2  # default
+
         if action == 1 and garbage:
-            reward = 1.0
+            reward = 0.9
         elif action == 2 and dumping:
-            reward = 1.0
+            reward = 0.8
         elif action == 1 and risk:
             reward = 0.5
 
@@ -48,4 +50,6 @@ class GarbageDetectionEnv:
             "risk": risk
         }
 
-        return self.current_state, float(reward), False, {}
+        done = False  # keep environment running
+
+        return self.current_state, float(reward), done, {}
