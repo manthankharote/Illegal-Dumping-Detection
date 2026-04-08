@@ -1,3 +1,6 @@
+from .tasks import task_easy, task_medium, task_hard
+
+
 class GarbageDetectionEnv:
     def __init__(self):
         self.current_step = 0
@@ -17,7 +20,7 @@ class GarbageDetectionEnv:
         return self.current_state
 
     def step(self, action):
-        # 🔥 Deterministic simulation (NO detector)
+        # 🔥 Deterministic simulation (3 tasks)
         if self.current_step == 0:
             garbage = True
             dumping = False
@@ -31,18 +34,7 @@ class GarbageDetectionEnv:
             dumping = False
             risk = True
 
-        # Reward strictly between (0,1)
-        reward = 0.2  # default
-
-        if action == 1 and garbage:
-            reward = 0.9
-        elif action == 2 and dumping:
-            reward = 0.8
-        elif action == 1 and risk:
-            reward = 0.5
-
-        self.current_step += 1
-
+        # Update state
         self.current_state = {
             "step": self.current_step,
             "garbage": garbage,
@@ -50,6 +42,22 @@ class GarbageDetectionEnv:
             "risk": risk
         }
 
-        done = False  # keep environment running
+        # 🔥 TASK GRADERS
+        easy_score = task_easy(self.current_state, action)
+        medium_score = task_medium(self.current_state, action)
+        hard_score = task_hard(self.current_state, action)
 
-        return self.current_state, float(reward), done, {}
+        # Final reward (strictly between 0 and 1)
+        reward = (easy_score + medium_score + hard_score) / 3
+
+        self.current_step += 1
+
+        done = False
+
+        return self.current_state, float(reward), done, {
+            "scores": {
+                "easy": easy_score,
+                "medium": medium_score,
+                "hard": hard_score
+            }
+        }
