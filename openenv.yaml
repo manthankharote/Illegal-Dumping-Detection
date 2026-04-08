@@ -12,9 +12,9 @@ endpoints:
   state: /state
 
 tasks:
-  - id: task_easy
-    description: Detect garbage presence
-  - id: task_medium
-    description: Detect illegal dumping
-  - id: task_hard
-    description: Predict environmental risk
+  - name: task_easy
+    description: Detect garbage
+  - name: task_medium
+    description: Detect dumping
+  - name: task_hard
+    description: Predict risk
