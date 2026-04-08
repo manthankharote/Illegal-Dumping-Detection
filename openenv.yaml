@@ -4,17 +4,14 @@ environment:
   type: python
 
 entrypoint:
-  command: uvicorn main:app --host 0.0.0.0 --port 7860
-
-endpoints:
-  reset: /reset
-  step: /step
-  state: /state
+  command: python inference.py
 
 tasks:
-  - name: task_easy
-    description: Detect garbage
-  - name: task_medium
-    description: Detect dumping
-  - name: task_hard
-    description: Predict risk
+  - id: task_easy
+    description: Detect garbage presence
+
+  - id: task_medium
+    description: Detect illegal dumping
+
+  - id: task_hard
+    description: Predict environmental risk
