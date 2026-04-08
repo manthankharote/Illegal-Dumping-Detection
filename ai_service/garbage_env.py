@@ -55,9 +55,9 @@ class GarbageDetectionEnv:
         done = False
 
         return self.current_state, float(reward), done, {
-            "scores": {
-                "easy": easy_score,
-                "medium": medium_score,
-                "hard": hard_score
-            }
-        }
+    "task_scores": {
+        "task_easy": easy_score,
+        "task_medium": medium_score,
+        "task_hard": hard_score
+    }
+}
