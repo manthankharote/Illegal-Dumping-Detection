@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from openai import OpenAI
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai_service'))
