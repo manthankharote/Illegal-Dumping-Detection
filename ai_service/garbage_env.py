@@ -12,7 +12,7 @@ class GarbageDetectionEnv:
     def step(self, action):
         self.current_step += 1
 
-        # 🔥 UNIQUE TASK PER STEP
+        # 🔥 RETURN ONLY ONE TASK PER STEP
         if self.current_step == 1:
             tasks = {"task_easy": 0.3}
         elif self.current_step == 2:
@@ -24,5 +24,7 @@ class GarbageDetectionEnv:
             {"step": self.current_step},
             0.5,
             self.current_step >= 3,
-            {"tasks": tasks}   # 👈 IMPORTANT
+            {
+                "tasks": tasks
+            }
         )
