@@ -8,10 +8,16 @@ entrypoint:
 
 tasks:
   - id: task_easy
-    description: Detect garbage presence
+    description: Detect garbage
+    grader:
+      type: numeric
 
   - id: task_medium
-    description: Detect illegal dumping
+    description: Detect dumping
+    grader:
+      type: numeric
 
   - id: task_hard
-    description: Predict environmental risk
+    description: Predict risk
+    grader:
+      type: numeric
