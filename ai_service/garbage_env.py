@@ -12,23 +12,12 @@ class GarbageDetectionEnv:
     def step(self, action):
         self.current_step += 1
 
-        # 🔥 DIFFERENT TASKS PER STEP
-        if self.current_step == 1:
-            task_scores = {
-                "task_easy": 0.4
-            }
-        elif self.current_step == 2:
-            task_scores = {
-                "task_medium": 0.6
-            }
-        elif self.current_step == 3:
-            task_scores = {
-                "task_hard": 0.8
-            }
-        else:
-            task_scores = {
-                "task_extra": 0.5
-            }
+        # 🔥 ALL 3 TASKS EVERY STEP (SAFE)
+        tasks = {
+            "task_easy": 0.4,
+            "task_medium": 0.6,
+            "task_hard": 0.8
+        }
 
         done = self.current_step >= 3
 
@@ -37,8 +26,8 @@ class GarbageDetectionEnv:
             0.5,
             done,
             {
-                "task_scores": {
-                    k: float(v) for k, v in task_scores.items()
+                "tasks": {
+                    k: float(v) for k, v in tasks.items()
                 }
             }
         )
