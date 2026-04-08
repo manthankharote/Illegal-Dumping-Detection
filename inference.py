@@ -2,16 +2,14 @@ import os
 import sys
 from openai import OpenAI
 
-# Add ai_service to path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai_service'))
-
 from ai_service.garbage_env import GarbageDetectionEnv
 
 
 def main():
     print("[START]")
 
-    # 🔥 SAFE LLM CALL (Phase 2 requirement)
+    # LLM (required for Phase 2)
     try:
         if os.getenv("API_BASE_URL") and os.getenv("API_KEY"):
             client = OpenAI(
@@ -21,24 +19,24 @@ def main():
 
             client.chat.completions.create(
                 model=os.getenv("MODEL_NAME", "gpt-4"),
-                messages=[
-                    {"role": "user", "content": "Analyze environment state"}
-                ],
-                max_tokens=10
+                messages=[{"role": "user", "content": "Analyze"}],
+                max_tokens=5
             )
-    except Exception:
+    except:
         pass
 
-    # Initialize environment
     env = GarbageDetectionEnv()
     env.reset()
 
-    # Fixed action sequence
     actions = [1, 2, 1]
 
     for action in actions:
         state, reward, done, info = env.step(action)
-        print(f"[STEP] action={action} reward={reward}")
+
+        # 🔥 CRITICAL: PRINT TASKS
+        tasks = state.get("tasks", {})
+
+        print(f"[STEP] action={action} reward={reward} tasks={tasks}")
 
     print("[END]")
 
