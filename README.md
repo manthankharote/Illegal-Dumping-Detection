@@ -5,7 +5,7 @@
 
 [![Demo Video](https://img.shields.io/badge/Watcha-Demo_Video-red?style=for-the-badge&logo=youtube)](#) *(Placeholder: Update with your Demo Video Link)*
 
-![Project Banner](https://via.placeholder.com/1200x400?text=Banner+Image+Placeholder) *(Placeholder: Update with your Banner Image)*
+![Project Banner](file:///E:/BERLIN/ENGG/banner.png)
 
 ---
 
