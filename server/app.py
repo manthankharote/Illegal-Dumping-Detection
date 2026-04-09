@@ -18,7 +18,6 @@ def step_env(req: dict):
     action = req.get("action", 1)
     obs, reward, done, info = env.step(action)
     
-    # EXACT OpenEnv JSON format. Nothing extra.
     return {
         "observation": obs,
         "reward": float(reward),
