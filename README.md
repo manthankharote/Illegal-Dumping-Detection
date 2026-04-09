@@ -113,6 +113,4 @@ A quick overview of the core architectural components:
 ```
 
 ---
-<div align="center">
-  <i>Submitted for the <b>Meta PyTorch x Scaler OpenEnv Hackathon</b></i> 🚀
-</div>
+
