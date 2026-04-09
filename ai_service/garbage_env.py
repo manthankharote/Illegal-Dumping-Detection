@@ -13,21 +13,30 @@ class GarbageDetectionEnv:
         self.current_step += 1
         done = self.current_step >= 3
         
-        # STRICTLY 3 TASKS, SCORES BETWEEN 0 AND 1 (Not 0.0, Not 1.0)
-        graders_dict = {
-            "task_1": 0.50,
-            "task_2": 0.65,
-            "task_3": 0.85
-        }
-
-        # ONLY return what standard RL environments return in info
+        # EXACT SCHEMA: Tasks strictly containing 'graders' inside them
         info = {
-            "graders": graders_dict
+            "tasks": {
+                "task_1": {
+                    "name": "Classification",
+                    "score": 0.55,
+                    "graders": { "main_grader": 0.55 }
+                },
+                "task_2": {
+                    "name": "BoundingBox",
+                    "score": 0.65,
+                    "graders": { "main_grader": 0.65 }
+                },
+                "task_3": {
+                    "name": "Reporting",
+                    "score": 0.85,
+                    "graders": { "main_grader": 0.85 }
+                }
+            }
         }
 
         return (
-            {"step": self.current_step}, # observation
-            0.5,                         # reward
-            done,                        # done flag
-            info                         # info dict containing graders
+            {"step": self.current_step},
+            0.5,
+            done,
+            info
         )
