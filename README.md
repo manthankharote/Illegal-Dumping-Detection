@@ -75,7 +75,7 @@ Follow these steps to deploy the environment locally.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/illegal-dumping-detection.git
+git clone https://github.com/manthankharote/illegal-dumping-detection.git
 cd illegal-dumping-detection
 
 # 2. Install the required Python dependencies
