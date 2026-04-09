@@ -1,29 +1,16 @@
-name: illegal-dumping-env
-
-environment:
-  type: python
-
-entrypoint:
-  command: python inference.py
-
+version: "1.0"
+name: "illegal-dumping-env"
+description: "Environment to detect illegal dumping using PyTorch"
 tasks:
-  - id: task_easy
-    description: Detect garbage
-    grader:
-      type: numeric
-      min: 0.0
-      max: 1.0
-
-  - id: task_medium
-    description: Detect dumping
-    grader:
-      type: numeric
-      min: 0.0
-      max: 1.0
-
-  - id: task_hard
-    description: Predict risk
-    grader:
-      type: numeric
-      min: 0.0
-      max: 1.0
+  - id: "task_1"
+    name: "Classification"
+    description: "Classify garbage type accurately"
+    difficulty: "easy"
+  - id: "task_2"
+    name: "Detection"
+    description: "Detect exact bounding box for dumping"
+    difficulty: "medium"
+  - id: "task_3"
+    name: "Reporting"
+    description: "Generate incident report"
+    difficulty: "hard"
