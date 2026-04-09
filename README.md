@@ -5,7 +5,7 @@
 
 [![Demo Video](https://img.shields.io/badge/Watcha-Demo_Video-red?style=for-the-badge&logo=youtube)](#) *(Placeholder: Update with your Demo Video Link)*
 
-![Project Banner](https://drive.google.com/file/d/1Fe4SaMvvjwpKvguxq9IrCKM2p9vWgGOY/view?usp=drive_link)
+![Project Banner](https://res.cloudinary.com/dim2u2lq2/image/upload/v1775763280/banner_nyjov0.png)
 
 ---
 
