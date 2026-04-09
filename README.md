@@ -50,7 +50,7 @@ We leveraged a modern, high-performance stack to ensure real-time capabilities a
 
 | Category | Technologies Used |
 | :--- | :--- |
-| **Computer Vision** | 👁️ PyTorch, YOLOv8 |
+| **Computer Vision** | 👁️ YOLOv8 |
 | **Agent / LLM** | 💬 OpenAI API, GPT-4 / Llama 3 |
 | **Backend & Framework** | 🚀 FastAPI, OpenEnv Validator |
 | **Automations & UI** | 🌐 WhatsApp API, Node.js, React (MERN Stack) |
