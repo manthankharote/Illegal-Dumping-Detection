@@ -23,7 +23,7 @@ Our solution uses a multi-modal pipeline, bridging raw sensor input to high-leve
 
 ```mermaid
 graph TD;
-    A[📷 Camera / Image] -->|Pixel Data| B[🧠 PyTorch / YOLOv8 Model<br/>Grader]
+    A[📷 Camera / Image] -->|Pixel Data| B[🧠 YOLOv8 Model<br/>Grader]
     B -->|Bounding Boxes & Confidence| C[⚡ FastAPI Server]
     C -->|Environment State| D[🛡️ OpenEnv Validator]
     D -->|Observation & Reward Context| E[🤖 LLM Agent]
