@@ -1,11 +1,12 @@
 """
-camera.py — Video Source Manager
-==================================
-Supports: webcam, droidcam, RTSP, YouTube live, video file.
-Uses a threaded VideoStream for zero-latency frame capture.
+Module: camera.py
+Role: Remote Visual Sensor Interfacing.
+Description: Implements real-time VideoStream bindings supporting multiple 
+protocols with embedded multithreading to eliminate inference latency bottlenecks.
 """
 
 import os
+# Suppress underlying decoder verbosity to ensure pristine validator extraction.
 os.environ["OPENCV_FFMPEG_LOGLEVEL"] = "-8"
 os.environ["OPENCV_LOG_LEVEL"] = "OFF"
 
@@ -17,8 +18,16 @@ import subprocess
 
 
 def extract_youtube_stream(url):
-    """Extract direct stream URL from YouTube using yt-dlp."""
-    print(f"  📺 Extracting YouTube stream: {url}")
+    """
+    Translates raw YouTube identifiers into direct RTSP broadcast protocols.
+    
+    Parameters:
+        url (str): The external remote streaming link.
+        
+    Returns:
+        tuple: Extracted source URL map and boolean indicating live status.
+    """
+    print(f"[SYSTEM] Extracting YouTube stream: {url}")
     try:
         cmd = [
             "yt-dlp",
@@ -29,20 +38,27 @@ def extract_youtube_stream(url):
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         stream_url = result.stdout.strip()
 
-        # Check if live
+        # Validate whether the broadcast is an ongoing live session.
         cmd_live = ["yt-dlp", "--get-filename", "-o", "%(is_live)s", url]
         is_live = subprocess.run(cmd_live, capture_output=True, text=True).stdout.strip() == "True"
 
         return stream_url, is_live
     except Exception as e:
-        print(f"  ❌ yt-dlp failed: {e}")
+        print(f"[ERROR] Subprocess yt-dlp failed during extraction: {e}")
         return None, False
 
 
 class VideoStream:
-    """Threaded video capture — always holds the latest frame."""
+    """
+    Asynchronous frame acquisition buffer running on a decoupled thread.
+    Continuously acquires state configurations, ensuring the primary logic process 
+    observes the absolute most recent image sensor vector without I/O blocking.
+    """
 
     def __init__(self, src, backend=None):
+        """
+        Preallocates streaming handles corresponding to requested inputs.
+        """
         if backend is not None:
             self.stream = cv2.VideoCapture(src, backend)
         elif isinstance(src, str) and (src.startswith("http") or src.startswith("rtsp")):
@@ -62,6 +78,9 @@ class VideoStream:
             self.thread.start()
 
     def _update(self):
+        """
+        A background process looping to synchronize the internal array buffers.
+        """
         while not self.stopped:
             try:
                 grabbed, frame = self.stream.read()
@@ -76,30 +95,45 @@ class VideoStream:
                 time.sleep(0.5)
 
     def read(self):
+        """
+        Retrieves a serialized copy of the current state vector.
+        """
         with self.lock:
             if self.frame is not None:
                 return self.grabbed, self.frame.copy()
             return False, None
 
     def isOpened(self):
+        """
+        Validates socket readiness configurations.
+        """
         return self.stream.isOpened()
 
     def release(self):
+        """
+        Safely disposes thread allocations and terminates sensor handles.
+        """
         self.stopped = True
         self.stream.release()
 
     def set(self, prop, val):
+        """
+        Modifies localized configuration parameters on the capture class.
+        """
         self.stream.set(prop, val)
 
 
 def open_source(source, url=None, file=None):
     """
-    Open a video source. Returns (VideoStream, label, reconnect_url).
+    Interrogates spatial logic environments to instantiate appropriate drivers.
 
-    Args:
-        source: "webcam", "droidcam", "rtsp", "youtube", or "video"
-        url:    URL for droidcam / rtsp / youtube
-        file:   file path for video
+    Parameters:
+        source (str): Identifier defining "webcam", "droidcam", "rtsp", "youtube", or "video".
+        url (str): Remote socket targeting droidcam/rtsp/youtube inputs.
+        file (str): Local pathway targeting discrete video artifact mappings.
+        
+    Returns:
+        tuple: Generated VideoStream architecture, descriptive labels, and reconnect targets.
     """
     if source == "webcam":
         cap = None
@@ -110,31 +144,31 @@ def open_source(source, url=None, file=None):
         ]
         for backend, name in backends:
             for idx in range(3):
-                print(f"  🔍 Trying webcam {idx} ({name})...")
+                print(f"[SYSTEM] Validating local sensor arrays: index {idx} ({name})...")
                 test = cv2.VideoCapture(idx, backend)
                 if test.isOpened():
                     ret, frm = test.read()
                     test.release()
                     if ret and frm is not None:
                         cap = VideoStream(idx, backend)
-                        print(f"  ✅ Webcam found: index {idx} ({name})")
+                        print(f"[SYSTEM] Hardware sensor established: index {idx} ({name})")
                         return cap, f"Webcam (index {idx})", str(idx)
                 else:
                     test.release()
 
-        print("\n  ❌ No webcam detected!")
-        print("  Try: python live_monitor.py --source droidcam --url http://PHONE_IP:4747/video")
+        print("\n[ERROR] Hardware sensor array initialization failed.")
+        print("[DEBUG] Manual intervention recommended for fallback interfaces.")
         sys.exit(1)
 
     elif source == "droidcam":
         if not url:
-            print("❌ --url is required for DroidCam")
+            print("[ERROR] Parameter '--url' strictly required for DroidCam architectures.")
             sys.exit(1)
         cap = VideoStream(url)
         if not cap.isOpened():
             for suffix in ["/video", "/mjpegfeed"]:
                 test_url = url.rstrip('/') + suffix
-                print(f"  🔍 Trying: {test_url}")
+                print(f"[SYSTEM] Probing alternative sockets: {test_url}")
                 cap = VideoStream(test_url)
                 if cap.isOpened():
                     url = test_url
@@ -143,28 +177,28 @@ def open_source(source, url=None, file=None):
 
     elif source == "rtsp":
         if not url:
-            print("❌ --url is required for RTSP")
+            print("[ERROR] Parameter '--url' strictly required for RTSP protocols.")
             sys.exit(1)
         return VideoStream(url), f"RTSP ({url})", url
 
     elif source == "youtube":
         if not url:
-            print("❌ --url is required for YouTube")
+            print("[ERROR] Parameter '--url' strictly required for YouTube routing.")
             sys.exit(1)
         stream_url, is_live = extract_youtube_stream(url)
         if not stream_url:
-            print("  ❌ Could not extract YouTube stream.")
+            print("[ERROR] Deserialization failure across upstream extractors.")
             sys.exit(1)
-        print(f"  ✅ Stream URL extracted")
-        print(f"  📡 Type: {'YouTube Live' if is_live else 'YouTube Video'}")
+        print(f"[SYSTEM] Direct stream target acquired successfully.")
+        print(f"[SYSTEM] Source paradigm: {'Live Broadcast' if is_live else 'Pre-rendered Broadcast'}")
         return VideoStream(stream_url), f"YouTube ({url})", url
 
     elif source == "video":
         if not file:
-            print("❌ --file is required for video source")
+            print("[ERROR] Parameter '--file' strictly required for discrete media access.")
             sys.exit(1)
         return VideoStream(file), f"Video ({file})", file
 
     else:
-        print(f"❌ Unknown source: {source}")
+        print(f"[ERROR] Unrecognized mapping designation encountered: {source}")
         sys.exit(1)

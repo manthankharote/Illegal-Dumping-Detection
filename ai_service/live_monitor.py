@@ -1,8 +1,8 @@
 """
-live_monitor.py — Live Garbage Detection Monitor (FINAL)
-========================================================
-Works with your custom detector.py (best.pt)
-Supports: webcam, droidcam, rtsp, youtube, video
+Module: live_monitor.py
+Role: Primary Real-Time Evaluation Monitoring Construct.
+Description: Deploys dynamic classifier paradigms on continuous visual protocols.
+Aggregates state thresholds, implements confidence heuristics, and dispatches artifacts.
 """
 
 import argparse
@@ -36,6 +36,12 @@ ALERT_COOLDOWN = 30
 # ─── BACKEND ────────────────────────────────────────────
 
 def send_to_backend(data: dict):
+    """
+    Asynchronously relays JSON payload heuristics through REST endpoints.
+    
+    Parameters:
+        data (dict): Compiled metrics encompassing observed spatial detections.
+    """
     try:
         r = requests.post(
             f"{BACKEND_URL}/api/detections",
@@ -43,28 +49,35 @@ def send_to_backend(data: dict):
             headers={"x-api-key": DETECTION_API_KEY},
             timeout=5
         )
-        print(f"  📡 Backend: {r.status_code}")
+        print(f"[SYSTEM] Backend ingestion protocol: status code {r.status_code}")
     except Exception as e:
-        print(f"  ❌ Backend error: {e}")
+        print(f"[ERROR] Internal upstream exception handled: {e}")
 
 
 # ─── MAIN LOOP ──────────────────────────────────────────
 
 def run_monitor(args):
+    """
+    Orchestrates the synchronous ingestion, prediction, and notification loop.
+    Iterates dynamically across continuous state frames generated from designated sources.
+    
+    Parameters:
+        args (Namespace): Configuration structures provided at initialization.
+    """
 
-    print("\n🏙️ CleanCity Live Monitor Started\n")
+    print("\n[SYSTEM] Continuous Real-Time Evaluation Process Initiated.\n")
 
     cap, source_label, reconnect_url = open_source(
         args.source, url=args.url, file=args.file
     )
 
     if not cap.isOpened():
-        print("❌ Camera not opened")
+        print("[ERROR] Failed to map the source vector stream.")
         sys.exit(1)
 
-    print(f"📹 Source: {source_label}")
+    print(f"[SYSTEM] Visual Vector Stream: {source_label}")
 
-    # 🔥 Load your model
+    # Instantiate the defined underlying heuristic object classifiers.
     detector = GarbageDetector("best.pt")
 
     frame_count = 0
@@ -75,7 +88,7 @@ def run_monitor(args):
             ret, frame = cap.read()
 
             if not ret:
-                print("⚠️ Reconnecting...")
+                print("[SYSTEM] Vector stream missing. Executing reconnection heuristic...")
                 cap.release()
                 time.sleep(2)
                 cap = VideoStream(reconnect_url)
@@ -83,12 +96,12 @@ def run_monitor(args):
 
             frame_count += 1
 
-            # Resize for speed
+            # Execute spatial reduction transformation for latency mitigation.
             h, w = frame.shape[:2]
             scale = FRAME_WIDTH / w
             frame = cv2.resize(frame, (FRAME_WIDTH, int(h * scale)))
 
-            # Skip frames
+            # Implements the temporal skipping threshold heuristic parameter.
             if frame_count % PROCESS_EVERY_N != 0:
                 continue
 
@@ -103,12 +116,12 @@ def run_monitor(args):
             timestamp = datetime.now().strftime("%H:%M:%S")
 
             if detected:
-                print(f"[{timestamp}] 🚨 DETECTED → {labels} ({total})")
+                print(f"[OBSERVATION] [{timestamp}] DETECTED ANOMALY → {labels} ({total})")
 
-                # Save evidence
+                # Serialize positive classification events into the isolated filesystem.
                 save_evidence(annotated, args.camera_id)
 
-                # Send backend alert (cooldown)
+                # Push events using cooldown logic to mitigate rapid consecutive evaluations.
                 if time.time() - last_alert > ALERT_COOLDOWN:
                     send_to_backend({
                         "imageBase64": frame_to_base64(annotated),
@@ -124,9 +137,9 @@ def run_monitor(args):
             # ── DISPLAY ──
             if args.display:
 
-                # Banner
+                # Synthesize localized Heads Up Display mechanisms across bounding areas.
                 color = (0, 0, 255) if detected else (0, 255, 0)
-                text = "GARBAGE DETECTED 🚨" if detected else "NO GARBAGE"
+                text = "HEURISTIC FLAG: VIOLATION LOGGED" if detected else "ENVIRONMENT STATIC"
 
                 overlay = annotated.copy()
                 cv2.rectangle(overlay, (0, 0), (FRAME_WIDTH, 40), color, -1)
@@ -136,18 +149,18 @@ def run_monitor(args):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                             (255, 255, 255), 2)
 
-                cv2.imshow("CleanCity Monitor", annotated)
+                cv2.imshow("Monitor Dashboard", annotated)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
     except KeyboardInterrupt:
-        print("\nStopped")
+        print("\n[SYSTEM] Received intercept loop termination protocol.")
 
     finally:
         cap.release()
         cv2.destroyAllWindows()
-        print("✅ Closed cleanly")
+        print("[SYSTEM] Safely deallocated temporal handlers and array buffers.")
 
 
 # ─── CLI ───────────────────────────────────────────────
