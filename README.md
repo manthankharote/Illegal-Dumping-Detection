@@ -1,11 +1,34 @@
 # 🗑️ Illegal Dumping Detection - A Real-World RL Agent
 
-> **Transforming municipal surveillance into autonomous, intelligent monitoring.**  
-> An end-to-end Reinforcement Learning (RL) environment built with the OpenEnv framework to detect illegal garbage dumping in real-time and autonomously decide the most effective corrective action.
+<div align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Badge" />
+  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch Badge" />
+  <img src="https://img.shields.io/badge/YOLOv11-00FFFF?style=for-the-badge&logo=ultralytics&logoColor=black" alt="YOLOv11 Badge" />
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI Badge" />
+  <img src="https://img.shields.io/badge/Twilio-F22F46?style=for-the-badge&logo=twilio&logoColor=white" alt="Twilio Badge" />
+  <img src="https://img.shields.io/badge/OpenEnv-FF6B6B?style=for-the-badge&logo=openai&logoColor=white" alt="OpenEnv Badge" />
+</div>
 
-[![Demo Video](https://img.shields.io/badge/Watcha-Demo_Video-red?style=for-the-badge&logo=youtube)](#) *(Placeholder: Update with your Demo Video Link)*
+> **Transforming municipal surveillance into an autonomous, intelligent monitoring powerhouse.**  
+> An end-to-end Reinforcement Learning (RL) environment built with the OpenEnv framework to detect illegal garbage dumping in real-time and autonomously decide the most effective corrective action. **This fully autonomous AI system actually triggers real-world WhatsApp alerts immediately upon detecting a violation!**
+
+<div align="center">
+
+[![Demo Video](https://img.shields.io/badge/Watch_a-Demo_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](#) *(Placeholder: Update with your Demo Video Link)*
 
 ![Project Banner](https://res.cloudinary.com/dim2u2lq2/image/upload/v1775763280/banner_nyjov0.png)
+
+</div>
+
+---
+
+## ✨ The "Wow" Factors
+
+Our system isn't just a prototype; it's a real-world deployable solution featuring:
+
+1. **🚀 Custom YOLOv11 Object Detection:** Highly accurate, edge-optimized computer vision that identifies garbage dynamically.
+2. **🧠 Intelligent OpenEnv Reinforcement Learning Agent:** An LLM-powered RL core that autonomously evaluates environmental states and makes deterministic decisions.
+3. **📱 Real-time WhatsApp Notification System via Twilio:** Closes the loop by immediately notifying municipal authorities with validated alerts directly to their phones.
 
 ---
 
@@ -13,7 +36,7 @@
 
 **The Problem:** Illegal garbage dumping is a pervasive environmental issue that degrades public spaces, creates health hazards, and strains municipal resources. Traditional CCTV monitoring requires constant human oversight, making it inefficient and unscalable.
 
-**The Solution:** We have developed a fully autonomous AI + RL system. By integrating edge computer vision with a sophisticated Reinforcement Learning environment, our system detects dumping events in real-time. An LLM-based agent then processes the environmental state and dynamically selects the best action—whether it's logging the event, alerting authorities, or issuing a fine—drastically reducing response times and human labor.
+**The Solution:** We have developed a **fully autonomous AI + RL system**. By integrating edge computer vision with a sophisticated Reinforcement Learning environment, our system detects dumping events in real-time. An LLM-based agent then processes the environmental state and dynamically selects the best action—whether it's logging the event, alerting authorities, or issuing a fine—drastically reducing response times and human labor.
 
 ---
 
@@ -23,7 +46,7 @@ Our solution uses a multi-modal pipeline, bridging raw sensor input to high-leve
 
 ```mermaid
 graph TD;
-    A[📷 Camera / Image] -->|Pixel Data| B[🧠 YOLOv8 Model<br/>Grader]
+    A[📷 Camera / Image] -->|Pixel Data| B[🧠 YOLOv11 Model<br/>Grader]
     B -->|Bounding Boxes & Confidence| C[⚡ FastAPI Server]
     C -->|Environment State| D[🛡️ OpenEnv Validator]
     D -->|Observation & Reward Context| E[🤖 LLM Agent]
@@ -50,10 +73,10 @@ We leveraged a modern, high-performance stack to ensure real-time capabilities a
 
 | Category | Technologies Used |
 | :--- | :--- |
-| **Computer Vision** | 👁️ YOLOv8 |
-| **Agent / LLM** | 💬 OpenAI API, GPT-4 / Llama 3 |
-| **Backend & Framework** | 🚀 FastAPI, OpenEnv Validator |
-| **Automations & UI** | 🌐 WhatsApp API, Node.js, React (MERN Stack) |
+| **Computer Vision** | 👁️ **YOLOv11** |
+| **Agent / LLM** | 💬 **OpenAI API, GPT-4 / Llama 3** |
+| **Backend & Framework** | 🚀 **FastAPI, OpenEnv Validator** |
+| **Automations & UI** | 🌐 **Twilio WhatsApp API, Node.js, React (MERN Stack)** |
 
 ---
 
@@ -72,6 +95,8 @@ At the core of our system is a custom **OpenEnv-compliant Reinforcement Learning
 ## ⚙️ Setup & Installation
 
 Follow these steps to deploy the environment locally.
+
+> **Note:** Make sure your API keys and tokens are properly configured before starting the services!
 
 ```bash
 # 1. Clone the repository
@@ -113,4 +138,3 @@ A quick overview of the core architectural components:
 ```
 
 ---
-
