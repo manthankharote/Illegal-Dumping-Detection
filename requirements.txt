@@ -1,4 +1,6 @@
-fastapi
-uvicorn
-pydantic
-openenv-core==0.2.3
+ultralytics
+requests
+python-dotenv
+twilio
+opencv-python-headless
+numpy
