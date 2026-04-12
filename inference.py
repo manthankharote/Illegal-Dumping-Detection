@@ -11,6 +11,11 @@ from dotenv import load_dotenv
 # Initialize environment variables to establish the configuration state.
 load_dotenv()
 
+
+# Dhyan do: Agar key nahi mili, toh 'dummy_key' use hogi taaki bot crash na ho!
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "dummy_key_for_bot")
+TWILIO_SID = os.getenv("TWILIO_ACCOUNT_SID", "dummy_sid_for_bot")
+
 # Import the core RL Environment module for orchestration.
 try:
     from ai_service.garbage_env import GarbageDetectionEnv
