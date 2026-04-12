@@ -4,3 +4,4 @@ python-dotenv
 twilio
 opencv-python-headless
 numpy
+openai
