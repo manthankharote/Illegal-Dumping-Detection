@@ -4,7 +4,7 @@
 
 # 🗑️ AgniX: Autonomous AI Agent for Illegal Dumping Detection
 
-**Team AgniX** presents a real-time municipal surveillance system built for the **Meta PyTorch OpenEnv Hackathon**. It is designed for smart cities to detect, analyze, and report illegal garbage dumping autonomously using AI vision, Reinforcement Learning, and real-time communication APIs.
+**Team AgniX presents an autonomous, AI-powered municipal surveillance system designed to help city authorities and municipal corporations detect, analyze, and eliminate illegal garbage dumping in real-time.
 
 ---
 
