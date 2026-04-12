@@ -4,7 +4,7 @@
 
 # 🗑️ AgniX: Autonomous AI Agent for Illegal Dumping Detection
 
-**Team AgniX presents an autonomous, AI-powered municipal surveillance system designed to help city authorities and municipal corporations detect, analyze, and eliminate illegal garbage dumping in real-time.
+Team AgniX presents an autonomous, AI-powered municipal surveillance system designed to help city authorities and municipal corporations detect, analyze, and eliminate illegal garbage dumping in real-time.
 
 ---
 
