@@ -14,9 +14,6 @@ except ImportError:
 
 load_dotenv()
 
-# Fallbacks for safety
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "dummy_key_for_bot")
-TWILIO_SID = os.getenv("TWILIO_ACCOUNT_SID", "dummy_sid_for_bot")
 
 try:
     from ai_service.garbage_env import GarbageDetectionEnv
@@ -45,7 +42,7 @@ def main():
     print("=" * 50)
     time.sleep(1)
 
-    for i, task_id in enumerate(tasks):
+    for task_id in tasks:
         print(f"[START] task={task_id} env=illegal-dumping model={model}", flush=True)
         
         current_state = env.state()
@@ -84,7 +81,7 @@ def main():
 
         time.sleep(1)
 
-        next_state, reward, done, info = env.step(action)
+        _, reward, done, info = env.step(action)
         
         print(f"[STEP] step=1 action={action} reward={reward:.2f} done=true error=null", flush=True)
         

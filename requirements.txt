@@ -7,3 +7,5 @@ python-dotenv
 twilio
 opencv-python-headless
 numpy
+onnx
+onnxruntime

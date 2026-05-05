@@ -1,7 +1,7 @@
 from ultralytics import YOLO
-import torch
 
-def inspect_model(model_path="best.pt"):
+
+def inspect_model(model_path="best.onnx"):
     print("\n" + "="*50)
     print(f"🔍 INSPECTING MODEL: {model_path}")
     print("="*50)

@@ -25,9 +25,22 @@ Thumbs.db
 # Project Specific
 backend/uploads/*
 !backend/uploads/.gitkeep
+ai_service/evidence/*
+!ai_service/evidence/.gitkeep
 frontend/dist/
-ai-service/yolov8n.pt
 
+# Machine Learning & Media
+*.pt
+*.onnx
+*.bin
+*.engine
+*.mp4
+*.avi
+*.mov
+*.jpg
+*.jpeg
+*.png
+.ipynb_checkpoints/
 # Sensitive/Private Docs
 demonstration_guide.md
 DEPLOYMENT.md

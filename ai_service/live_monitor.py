@@ -29,7 +29,7 @@ DETECTION_API_KEY = os.environ.get("DETECTION_API_KEY", "cleancity-detection-key
 
 PROCESS_EVERY_N = 3
 FRAME_WIDTH = 1080
-CONFIDENCE_THRESHOLD = 0.4
+
 ALERT_COOLDOWN = 30
 
 
@@ -78,7 +78,7 @@ def run_monitor(args):
     print(f"[SYSTEM] Visual Vector Stream: {source_label}")
 
     # Instantiate the defined underlying heuristic object classifiers.
-    detector = GarbageDetector("best.pt")
+    detector = GarbageDetector("best.onnx")
 
     frame_count = 0
     last_alert = 0

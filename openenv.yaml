@@ -1,9 +1,0 @@
-version: "1.0"
-name: "illegal-dumping"
-tasks:
-  - id: "task_1"
-    grader: "ai_service.evaluator:grade_task_1"
-  - id: "task_2"
-    grader: "ai_service.evaluator:grade_task_2"
-  - id: "task_3"
-    grader: "ai_service.evaluator:grade_task_3"
