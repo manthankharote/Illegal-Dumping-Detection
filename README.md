@@ -57,5 +57,4 @@ cd Illegal-Dumping-Detection
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run the baseline agent (Ensure .env is configured locally for Twilio)
-python inference.py
+
