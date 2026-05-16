@@ -1,7 +1,10 @@
 from ultralytics import YOLO
 
 
-def inspect_model(model_path="best.onnx"):
+def inspect_model(model_path=None):
+    if model_path is None:
+        import os
+        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "best.pt")
     print("\n" + "="*50)
     print(f"🔍 INSPECTING MODEL: {model_path}")
     print("="*50)

@@ -56,6 +56,34 @@ router.post('/', validateApiKey, asyncHandler(async (req, res) => {
   // Emit real-time alert to admin dashboards
   emitCCTVDetection(detection);
 
+  // Send WhatsApp Alerts to Worker and Admin
+  try {
+    const { isWhatsAppReady, sendWhatsAppAlert } = require('../services/whatsappService');
+    const User = require('../models/User');
+
+    if (isWhatsAppReady()) {
+      const worker = await User.findOne({ ward: detection.ward, role: 'worker' });
+      const admin = await User.findOne({ ward: detection.ward, role: 'admin' });
+
+      const alertMessage = `🚨 *ILLEGAL DUMPING DETECTED*
+📍 Camera: ${detection.cameraName}
+🏘️ Ward: ${detection.ward}
+⚠️ Severity: ${detection.severity}
+🤖 Confidence: ${Math.round(detection.confidence * 100)}%
+🕐 Time: ${new Date().toLocaleString()}
+Please report to location immediately.`;
+
+      if (worker && worker.phone) {
+        await sendWhatsAppAlert(worker.phone, alertMessage);
+      }
+      if (admin && admin.phone) {
+        await sendWhatsAppAlert(admin.phone, alertMessage);
+      }
+    }
+  } catch (error) {
+    console.error('[ERROR] Failed to dispatch WhatsApp alerts:', error);
+  }
+
   sendSuccess(res, 201, detection, 'Detection reported successfully');
 }));
 

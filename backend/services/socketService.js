@@ -30,6 +30,7 @@ const emitNewAlert = (report) => {
 // Notify specific worker of task assignment
 const emitTaskAssigned = (workerId, task) => {
   if (io) {
+    // Verified: Emits to room "worker-{workerId}" with event name "task-assigned"
     io.to(`worker-${workerId}`).emit('task-assigned', task);
     io.to('admins').emit('task-update', { type: 'assigned', task });
   }

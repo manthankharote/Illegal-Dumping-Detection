@@ -27,10 +27,10 @@ from utils import frame_to_base64, save_evidence
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:5000")
 DETECTION_API_KEY = os.environ.get("DETECTION_API_KEY", "cleancity-detection-key")
 
-PROCESS_EVERY_N = 3
+PROCESS_EVERY_N = 10
 FRAME_WIDTH = 1080
 
-ALERT_COOLDOWN = 30
+ALERT_COOLDOWN = 120
 
 
 # ─── BACKEND ────────────────────────────────────────────
@@ -78,10 +78,11 @@ def run_monitor(args):
     print(f"[SYSTEM] Visual Vector Stream: {source_label}")
 
     # Instantiate the defined underlying heuristic object classifiers.
-    detector = GarbageDetector("best.onnx")
+    detector = GarbageDetector()
 
     frame_count = 0
     last_alert = 0
+    consecutive_no_detection_count = 0
 
     try:
         while True:
@@ -116,7 +117,15 @@ def run_monitor(args):
             timestamp = datetime.now().strftime("%H:%M:%S")
 
             if detected:
+                # Reset no-detection streak since we detected garbage
+                consecutive_no_detection_count = 0
+                
                 print(f"[OBSERVATION] [{timestamp}] DETECTED ANOMALY → {labels} ({total})")
+                
+                # Print spatial heuristic analysis payload
+                import json
+                print("[SPATIAL HEURISTIC RESULT]")
+                print(json.dumps(result["analysis"], indent=2))
 
                 # Serialize positive classification events into the isolated filesystem.
                 save_evidence(annotated, args.camera_id)
@@ -133,6 +142,11 @@ def run_monitor(args):
                         "total": total
                     })
                     last_alert = time.time()
+            else:
+                # Increment no-detection streak
+                consecutive_no_detection_count += 1
+                if consecutive_no_detection_count >= 5:
+                    last_alert = 0  # Reset cooldown so next detection starts fresh
 
             # ── DISPLAY ──
             if args.display:
