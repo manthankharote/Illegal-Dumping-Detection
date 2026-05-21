@@ -94,6 +94,67 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'CleanCity API is running', timestamp: new Date().toISOString() });
 });
 
+// WhatsApp diagnostic endpoints
+const { getWhatsAppStatus } = require('./services/whatsappService');
+
+app.get('/api/whatsapp/status', (req, res) => {
+  const status = getWhatsAppStatus();
+  res.json({ success: true, ...status });
+});
+
+app.get('/api/whatsapp/scan', (req, res) => {
+  const status = getWhatsAppStatus();
+  if (status.isReady) {
+    return res.send(`
+      <html>
+        <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white;">
+          <div style="text-align: center; border: 1px solid #22c55e; padding: 2rem; border-radius: 12px; background: #1e293b;">
+            <h1 style="color: #22c55e;">✅ WhatsApp Client is Ready!</h1>
+            <p>You have successfully authenticated the agent.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  }
+  
+  if (status.initStatus === 'qr_ready' && status.qrCode) {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(status.qrCode)}`;
+    return res.send(`
+      <html>
+        <head>
+          <meta http-equiv="refresh" content="5">
+        </head>
+        <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white;">
+          <div style="text-align: center; border: 1px solid #334155; padding: 2rem; border-radius: 12px; background: #1e293b;">
+            <h1 style="color: #38bdf8;">📲 Scan WhatsApp QR Code</h1>
+            <p>Open WhatsApp on your phone, go to Linked Devices, and scan this QR code:</p>
+            <div style="background: white; padding: 1rem; display: inline-block; border-radius: 8px; margin: 1rem 0;">
+              <img src="${qrUrl}" alt="WhatsApp QR Code" style="display: block;" />
+            </div>
+            <p style="color: #94a3b8; font-size: 0.875rem;">Page auto-refreshes every 5 seconds. Status: <strong>${status.initStatus}</strong></p>
+          </div>
+        </body>
+      </html>
+    `);
+  }
+  
+  return res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3">
+      </head>
+      <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white;">
+        <div style="text-align: center; border: 1px solid #e11d48; padding: 2rem; border-radius: 12px; background: #1e293b;">
+          <h1 style="color: #f43f5e;">⏳ WhatsApp Client Loading...</h1>
+          <p>Status: <strong>${status.initStatus}</strong></p>
+          ${status.lastError ? `<p style="color: #f43f5e; background: #881337; padding: 0.5rem; border-radius: 6px;">Error: ${status.lastError}</p>` : ''}
+          <p style="color: #94a3b8; font-size: 0.875rem;">Waiting for Puppeteer to launch. Page auto-refreshes every 3 seconds...</p>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });

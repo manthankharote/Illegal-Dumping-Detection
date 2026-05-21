@@ -1,6 +1,9 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
+let initStatus = 'Not started';
+let lastError = null;
+let qrCode = null;
 let isReady = false;
 let messageQueue = [];
 
@@ -22,6 +25,8 @@ const client = new Client({
 });
 
 client.on('qr', (qr) => {
+    initStatus = 'qr_ready';
+    qrCode = qr;
     console.log('[SYSTEM] WhatsApp QR Code generated. Please scan to authenticate:');
     qrcode.generate(qr, { small: true });
 });
@@ -29,27 +34,36 @@ client.on('qr', (qr) => {
 client.on('ready', () => {
     console.log('[SYSTEM] WhatsApp Client is ready!');
     isReady = true;
+    initStatus = 'ready';
+    qrCode = null;
     console.log('[WHATSAPP] ✅ Client ready! Queue will be flushed in next 5s cycle.');
 });
 
 client.on('authenticated', () => {
+    initStatus = 'authenticated';
     console.log('[SYSTEM] WhatsApp Client authenticated successfully.');
 });
 
 client.on('auth_failure', msg => {
     console.error('[ERROR] WhatsApp Authentication failure:', msg);
     isReady = false;
+    initStatus = 'auth_failure';
+    lastError = msg;
 });
 
 client.on('disconnected', (reason) => {
     console.log('[SYSTEM] WhatsApp Client disconnected:', reason);
     isReady = false;
+    initStatus = 'disconnected';
 });
 
 // Initialize client immediately with error handling
 console.log('[SYSTEM] Initializing WhatsApp Client...');
+initStatus = 'initializing';
 client.initialize().catch(err => {
     console.error('[ERROR] Failed to initialize WhatsApp Client:', err);
+    initStatus = 'failed';
+    lastError = err.message || err;
 });
 
 setInterval(async () => {
@@ -114,8 +128,19 @@ const getQueueLength = () => {
     return messageQueue.length;
 };
 
+const getWhatsAppStatus = () => {
+    return {
+        isReady,
+        initStatus,
+        qrCode,
+        lastError,
+        queueLength: messageQueue.length
+    };
+};
+
 module.exports = {
     isWhatsAppReady,
     sendWhatsAppAlert,
-    getQueueLength
+    getQueueLength,
+    getWhatsAppStatus
 };
