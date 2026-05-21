@@ -9,7 +9,15 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process'
+        ],
     }
 });
 
@@ -38,8 +46,11 @@ client.on('disconnected', (reason) => {
     isReady = false;
 });
 
-// Initialize client immediately
-client.initialize();
+// Initialize client immediately with error handling
+console.log('[SYSTEM] Initializing WhatsApp Client...');
+client.initialize().catch(err => {
+    console.error('[ERROR] Failed to initialize WhatsApp Client:', err);
+});
 
 setInterval(async () => {
     if (!isReady || messageQueue.length === 0) {
