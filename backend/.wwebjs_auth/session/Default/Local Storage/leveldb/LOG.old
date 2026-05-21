@@ -1,6 +1,0 @@
-2026/05/18-14:19:20.607 6818 Reusing MANIFEST E:\BERLIN\ENGG\PROJECTS\Wmanthan\Illegal\backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
-2026/05/18-14:19:20.611 6818 Recovering log #13
-2026/05/18-14:19:20.613 6818 Reusing old log E:\BERLIN\ENGG\PROJECTS\Wmanthan\Illegal\backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000013.log 
-2026/05/18-14:21:21.837 6818 Level-0 table #17: started
-2026/05/18-14:21:21.857 6818 Level-0 table #17: 15484 bytes OK
-2026/05/18-14:21:21.865 6818 Delete type=0 #13

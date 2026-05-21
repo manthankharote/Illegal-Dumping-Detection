@@ -29,6 +29,10 @@ ai_service/evidence/*
 !ai_service/evidence/.gitkeep
 frontend/dist/
 
+# WhatsApp Web Session (Puppeteer/Chromium data - very large)
+backend/.wwebjs_auth/
+backend/.wwebjs_cache/
+
 # Machine Learning & Media
 *.pt
 *.onnx
