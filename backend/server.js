@@ -118,21 +118,35 @@ app.get('/api/whatsapp/scan', (req, res) => {
   }
   
   if (status.initStatus === 'qr_ready' && status.qrCode) {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(status.qrCode)}`;
     return res.send(`
       <html>
         <head>
           <meta http-equiv="refresh" content="5">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
         </head>
         <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white;">
           <div style="text-align: center; border: 1px solid #334155; padding: 2rem; border-radius: 12px; background: #1e293b;">
             <h1 style="color: #38bdf8;">📲 Scan WhatsApp QR Code</h1>
             <p>Open WhatsApp on your phone, go to Linked Devices, and scan this QR code:</p>
-            <div style="background: white; padding: 1rem; display: inline-block; border-radius: 8px; margin: 1rem 0;">
-              <img src="${qrUrl}" alt="WhatsApp QR Code" style="display: block;" />
+            <div style="background: white; padding: 1.5rem; display: inline-block; border-radius: 8px; margin: 1rem 0;">
+              <div id="qrcode"></div>
             </div>
             <p style="color: #94a3b8; font-size: 0.875rem;">Page auto-refreshes every 5 seconds. Status: <strong>${status.initStatus}</strong></p>
           </div>
+          <script>
+            try {
+              new QRCode(document.getElementById("qrcode"), {
+                text: ${JSON.stringify(status.qrCode)},
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+              });
+            } catch (err) {
+              document.getElementById("qrcode").innerHTML = "<p style='color:red'>Failed to render QR Code. Retrying...</p>";
+            }
+          </script>
         </body>
       </html>
     `);
