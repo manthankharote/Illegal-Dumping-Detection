@@ -1,3 +1,12 @@
+---
+title: Illegal Garbage Dumping Detection
+emoji: 🗑️
+colorFrom: red
+colorTo: yellow
+sdk: docker
+pinned: false
+---
+
 <div align="center">
   <img src="https://res.cloudinary.com/dim2u2lq2/image/upload/v1775763280/banner_nyjov0.png" alt="AgniX Banner" width="100%">
 </div>
