@@ -1,0 +1,17 @@
+2026/05/18-14:19:22.087 125c Reusing MANIFEST E:\BERLIN\ENGG\PROJECTS\Wmanthan\Illegal\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/05/18-14:19:22.087 125c Recovering log #56
+2026/05/18-14:19:22.099 125c Reusing old log E:\BERLIN\ENGG\PROJECTS\Wmanthan\Illegal\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000056.log 
+2026/05/18-14:19:22.099 125c Delete type=2 #53
+2026/05/18-14:19:22.099 125c Delete type=2 #54
+2026/05/18-14:19:22.099 125c Delete type=2 #57
+2026/05/18-14:34:52.577 29d0 Level-0 table #62: started
+2026/05/18-14:34:52.671 29d0 Level-0 table #62: 1087359 bytes OK
+2026/05/18-14:34:52.674 29d0 Delete type=0 #56
+2026/05/18-14:34:59.220 29d0 Compacting 1@1 + 2@2 files
+2026/05/18-14:34:59.502 29d0 Generated table #63@1: 73151 keys, 2261306 bytes
+2026/05/18-14:34:59.693 29d0 Generated table #64@1: 15910 keys, 1224201 bytes
+2026/05/18-14:34:59.694 29d0 Compacted 1@1 + 2@2 files => 3485507 bytes
+2026/05/18-14:34:59.695 29d0 compacted to: files[ 0 0 2 0 0 0 0 ]
+2026/05/18-14:34:59.698 29d0 Delete type=2 #58
+2026/05/18-14:34:59.698 29d0 Delete type=2 #59
+2026/05/18-14:34:59.698 29d0 Delete type=2 #62

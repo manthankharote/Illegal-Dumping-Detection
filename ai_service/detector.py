@@ -46,7 +46,7 @@ class GarbageDetector:
             cx = (x1 + x2) / 2
             cy = (y1 + y2) / 2
             
-            det = {"label": label, "conf": conf, "cx": cx, "cy": cy}
+            det = {"label": label, "conf": conf, "cx": cx, "cy": cy, "y1": y1, "y2": y2}
             
             if label == "person":
                 persons.append(det)
@@ -71,36 +71,46 @@ class GarbageDetector:
             # Calculate distance between the first garbage and nearest dustbin
             # For simplicity, using max confidence garbage if multiple, but here just first
             g = garbages[0]
+            p = persons[0]
             g_conf = g["conf"]
-            p_conf = persons[0]["conf"]
+            p_conf = p["conf"]
             
-            if dustbin_detected:
-                # Find nearest dustbin
-                nearest_dist = float('inf')
-                nearest_d_conf = 0.0
-                for d in dustbins:
-                    dist = math.sqrt((g["cx"] - d["cx"])**2 + (g["cy"] - d["cy"])**2)
-                    if dist < nearest_dist:
-                        nearest_dist = dist
-                        nearest_d_conf = d["conf"]
-                
-                distance = nearest_dist
-                # Confidence score can be average of all involved
-                confidence_score = (g_conf + p_conf + nearest_d_conf) / 3.0
-                
-                if distance <= 200:
-                    event_detected = True
-                    classification = "LEGAL"
-                    reason = f"Garbage is near dustbin (distance: {distance:.1f}px <= 200px)."
+            garbage_center_y = (g["y1"] + g["y2"]) / 2
+            person_bottom_y = p["y2"]
+            
+            if garbage_center_y < (person_bottom_y - 100):
+                event_detected = False
+                classification = "HOLDING"
+                reason = "Garbage appears to be held by person, not dumped yet."
+                confidence_score = (g_conf + p_conf) / 2.0
+            else:
+                if dustbin_detected:
+                    # Find nearest dustbin
+                    nearest_dist = float('inf')
+                    nearest_d_conf = 0.0
+                    for d in dustbins:
+                        dist = math.sqrt((g["cx"] - d["cx"])**2 + (g["cy"] - d["cy"])**2)
+                        if dist < nearest_dist:
+                            nearest_dist = dist
+                            nearest_d_conf = d["conf"]
+                    
+                    distance = nearest_dist
+                    # Confidence score can be average of all involved
+                    confidence_score = (g_conf + p_conf + nearest_d_conf) / 3.0
+                    
+                    if distance <= 200:
+                        event_detected = True
+                        classification = "LEGAL"
+                        reason = f"Garbage is near dustbin (distance: {distance:.1f}px <= 200px)."
+                    else:
+                        event_detected = True
+                        classification = "ILLEGAL"
+                        reason = f"Nearest dustbin is too far (distance: {distance:.1f}px > 200px)."
                 else:
                     event_detected = True
                     classification = "ILLEGAL"
-                    reason = f"Nearest dustbin is too far (distance: {distance:.1f}px > 200px)."
-            else:
-                event_detected = True
-                classification = "ILLEGAL"
-                reason = "Person and garbage detected, but no dustbin present."
-                confidence_score = (g_conf + p_conf) / 2.0
+                    reason = "Person and garbage detected, but no dustbin present."
+                    confidence_score = (g_conf + p_conf) / 2.0
         elif person_detected or garbage_detected:
             # Set confidence to whatever was detected
             if person_detected:

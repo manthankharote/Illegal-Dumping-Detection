@@ -27,10 +27,10 @@ from utils import frame_to_base64, save_evidence
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:5000")
 DETECTION_API_KEY = os.environ.get("DETECTION_API_KEY", "cleancity-detection-key")
 
-PROCESS_EVERY_N = 10
-FRAME_WIDTH = 1080
+PROCESS_EVERY_N = 6
+FRAME_WIDTH = 640
 
-ALERT_COOLDOWN = 120
+ALERT_COOLDOWN = 60
 
 
 # ─── BACKEND ────────────────────────────────────────────
@@ -116,44 +116,55 @@ def run_monitor(args):
 
             timestamp = datetime.now().strftime("%H:%M:%S")
 
-            if detected:
-                # Reset no-detection streak since we detected garbage
+            analysis = result["analysis"]
+            classification = analysis["classification"]
+            confidence_score = analysis["confidence_score"]
+
+            import json
+            print(f"[OBSERVATION] [{timestamp}] Classification: {classification} | Labels: {labels}")
+            print("[SPATIAL ANALYSIS]", json.dumps(analysis, indent=2))
+
+            if classification == "ILLEGAL":
                 consecutive_no_detection_count = 0
-                
-                print(f"[OBSERVATION] [{timestamp}] DETECTED ANOMALY → {labels} ({total})")
-                
-                # Print spatial heuristic analysis payload
-                import json
-                print("[SPATIAL HEURISTIC RESULT]")
-                print(json.dumps(result["analysis"], indent=2))
+                print(f"[ILLEGAL DUMP] [{timestamp}] Open area dumping detected!")
 
-                # Serialize positive classification events into the isolated filesystem.
-                save_evidence(annotated, args.camera_id)
-
-                # Push events using cooldown logic to mitigate rapid consecutive evaluations.
                 if time.time() - last_alert > ALERT_COOLDOWN:
+                    save_evidence(annotated, args.camera_id)
                     send_to_backend({
                         "imageBase64": frame_to_base64(annotated),
                         "cameraId": args.camera_id,
                         "cameraName": args.camera_name,
+                        "ward": args.ward,
                         "latitude": args.lat,
                         "longitude": args.lng,
-                        "detectedObjects": labels,
-                        "total": total
+                        "detectedObjects": [{"label": l} for l in labels],
+                        "total": total,
+                        "confidence": result["analysis"]["confidence_score"],
+                        "dumpType": "ILLEGAL"
                     })
                     last_alert = time.time()
+                    print(f"[ALERT SENT] Next alert in {ALERT_COOLDOWN}s")
+                else:
+                    remaining = int(ALERT_COOLDOWN - (time.time() - last_alert))
+                    print(f"[COOLDOWN] Next alert in {remaining}s")
+
+            elif classification == "LEGAL":
+                consecutive_no_detection_count = 0
+                print(f"[LEGAL DUMP] [{timestamp}] Garbage near dustbin, no alert.")
+
             else:
-                # Increment no-detection streak
                 consecutive_no_detection_count += 1
+                print(f"[NO EVENT] [{timestamp}] No dump detected. Streak: {consecutive_no_detection_count}")
                 if consecutive_no_detection_count >= 5:
-                    last_alert = 0  # Reset cooldown so next detection starts fresh
+                    last_alert = 0
+                    print("[RESET] Cooldown reset — garbage gone from scene.")
 
             # ── DISPLAY ──
             if args.display:
 
                 # Synthesize localized Heads Up Display mechanisms across bounding areas.
-                color = (0, 0, 255) if detected else (0, 255, 0)
-                text = "HEURISTIC FLAG: VIOLATION LOGGED" if detected else "ENVIRONMENT STATIC"
+                color = (0, 0, 255) if classification == "ILLEGAL" else (0, 200, 0) if classification == "LEGAL" else (100, 100, 100)
+                text = "⚠ ILLEGAL DUMP DETECTED" if classification == "ILLEGAL" else "✓ LEGAL DUMP" if classification == "LEGAL" else "MONITORING..."
 
                 overlay = annotated.copy()
                 cv2.rectangle(overlay, (0, 0), (FRAME_WIDTH, 40), color, -1)
@@ -163,7 +174,8 @@ def run_monitor(args):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                             (255, 255, 255), 2)
 
-                cv2.imshow("Monitor Dashboard", annotated)
+                display_frame = cv2.resize(annotated, (640, 360))
+                cv2.imshow("Monitor Dashboard", display_frame)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -191,6 +203,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--camera-id", default="cam-001")
     parser.add_argument("--camera-name", default="Main Camera")
+    parser.add_argument("--ward", default="Unassigned")
 
     parser.add_argument("--lat", type=float, default=18.5204)
     parser.add_argument("--lng", type=float, default=73.8567)

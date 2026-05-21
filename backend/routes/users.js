@@ -53,4 +53,44 @@ router.get('/workers', authenticate, authorize('admin', 'superadmin'), asyncHand
   sendSuccess(res, 200, workers, 'Workers fetched');
 }));
 
+// GET /api/users/ward-staff - Get all workers + admins in logged-in admin's ward
+router.get('/ward-staff', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  const ward = req.user.ward;
+  if (!ward) return sendError(res, 400, 'No ward assigned to your account');
+
+  const staff = await User.find({ 
+    ward, 
+    role: { $in: ['worker', 'admin'] }, 
+    isActive: true 
+  }).select('name email phone role ward').sort({ role: 1, name: 1 });
+
+  sendSuccess(res, 200, staff, 'Ward staff fetched');
+}));
+
+// PUT /api/users/:id/phone - Admin updates a ward member's phone number
+router.put('/:id/phone', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return sendError(res, 400, 'Phone number is required');
+
+  // Ensure admin can only update users in their own ward
+  const targetUser = await User.findById(req.params.id);
+  if (!targetUser) return sendError(res, 404, 'User not found');
+  
+  if (req.user.role === 'admin' && targetUser.ward !== req.user.ward) {
+    return sendError(res, 403, 'You can only update staff in your own ward');
+  }
+
+  // Normalize phone: prefix 91 if needed
+  let normalizedPhone = phone.replace(/\D/g, '');
+  if (normalizedPhone.length === 10) normalizedPhone = '91' + normalizedPhone;
+
+  const updated = await User.findByIdAndUpdate(
+    req.params.id,
+    { phone: normalizedPhone },
+    { new: true }
+  ).select('name email phone role ward');
+
+  sendSuccess(res, 200, updated, 'Phone number updated');
+}));
+
 module.exports = router;

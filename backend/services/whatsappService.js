@@ -2,11 +2,13 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
 let isReady = false;
+let messageQueue = [];
 
 // Initialize WhatsApp Client with LocalAuth so session is saved
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     }
 });
@@ -19,6 +21,7 @@ client.on('qr', (qr) => {
 client.on('ready', () => {
     console.log('[SYSTEM] WhatsApp Client is ready!');
     isReady = true;
+    console.log('[WHATSAPP] ✅ Client ready! Queue will be flushed in next 5s cycle.');
 });
 
 client.on('authenticated', () => {
@@ -38,6 +41,28 @@ client.on('disconnected', (reason) => {
 // Initialize client immediately
 client.initialize();
 
+setInterval(async () => {
+    if (!isReady || messageQueue.length === 0) {
+        if (!isReady && messageQueue.length > 0) {
+            console.log(`[WHATSAPP QUEUE] Client not ready. ${messageQueue.length} message(s) waiting...`);
+        }
+        return;
+    }
+    console.log(`[WHATSAPP QUEUE] Processing ${messageQueue.length} queued message(s)...`);
+    const toSend = [...messageQueue];
+    messageQueue = [];
+    for (const item of toSend) {
+        try {
+            const cleaned = item.phoneNumber.replace(/\D/g, '');
+            const formatted = cleaned.includes('@c.us') ? cleaned : `${cleaned}@c.us`;
+            await client.sendMessage(formatted, item.message);
+            console.log(`[WHATSAPP QUEUE] ✅ Sent to ${item.phoneNumber}`);
+        } catch (err) {
+            console.error(`[WHATSAPP QUEUE] ❌ Failed to send to ${item.phoneNumber}:`, err.message);
+        }
+    }
+}, 5000);
+
 /**
  * Checks if the WhatsApp client is authenticated and ready to send messages
  * @returns {boolean}
@@ -52,21 +77,34 @@ const isWhatsAppReady = () => {
  * @param {string} message - The message payload
  */
 const sendWhatsAppAlert = async (phoneNumber, message) => {
-    if (!isReady) {
-        console.warn(`[WARNING] Cannot send WhatsApp alert to ${phoneNumber}. Client is not ready.`);
+    if (!phoneNumber) {
+        console.warn('[WHATSAPP] ⚠ No phone number provided, skipping.');
         return;
     }
-    try {
-        // Ensure phone number format includes country code and @c.us
-        const formattedNumber = phoneNumber.includes('@c.us') ? phoneNumber : `${phoneNumber}@c.us`;
-        await client.sendMessage(formattedNumber, message);
-        console.log(`[SYSTEM] WhatsApp alert sent successfully to ${phoneNumber}`);
-    } catch (error) {
-        console.error(`[ERROR] Failed to send WhatsApp message to ${phoneNumber}:`, error);
+    messageQueue.push({ phoneNumber, message });
+    console.log(`[WHATSAPP] Message queued for ${phoneNumber}. Queue size: ${messageQueue.length}`);
+
+    if (isReady) {
+        try {
+            const cleaned = phoneNumber.replace(/\D/g, '');
+            const formatted = cleaned.includes('@c.us') ? cleaned : `${cleaned}@c.us`;
+            await client.sendMessage(formatted, message);
+            messageQueue.pop();
+            console.log(`[WHATSAPP] ✅ Sent immediately to ${phoneNumber}`);
+        } catch (error) {
+            console.error(`[WHATSAPP] ❌ Immediate send failed, will retry via queue: ${error.message}`);
+        }
+    } else {
+        console.log(`[WHATSAPP] Client not ready — message queued, will send when ready.`);
     }
+};
+
+const getQueueLength = () => {
+    return messageQueue.length;
 };
 
 module.exports = {
     isWhatsAppReady,
-    sendWhatsAppAlert
+    sendWhatsAppAlert,
+    getQueueLength
 };

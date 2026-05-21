@@ -4,7 +4,6 @@ openai
 ultralytics
 requests
 python-dotenv
-twilio
 opencv-python-headless
 numpy
 onnx

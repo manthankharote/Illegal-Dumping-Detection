@@ -2,7 +2,7 @@
 LIVE DEMO SCRIPT - Screen Capture Integration
 =============================================
 This script continuously captures the screen (e.g., a YouTube Live CCTV feed),
-sends the frames to the Roboflow Vision API, and triggers WhatsApp alerts via Twilio.
+sends the frames to the Roboflow Vision API, and triggers WhatsApp alerts via the Node.js backend.
 """
 
 import time

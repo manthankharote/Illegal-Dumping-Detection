@@ -1,5 +1,5 @@
 // Notification service – abstracted for multiple channels
-// Plug in FCM, Twilio, SendGrid credentials in .env when deploying
+// Plug in FCM, SendGrid credentials in .env when deploying
 
 const sendNotification = async ({ type, to, title, body, data = {} }) => {
   // Log all notifications in development
@@ -8,7 +8,7 @@ const sendNotification = async ({ type, to, title, body, data = {} }) => {
   // TODO: Integrate FCM for push
   // if (type === 'push' && data.fcmToken) { ... }
 
-  // TODO: Integrate Twilio for SMS
+  // TODO: Integrate SMS provider
   // if (type === 'sms') { ... }
 
   // TODO: Integrate SendGrid for email

@@ -17,7 +17,7 @@ Team AgniX presents an autonomous, AI-powered municipal surveillance system desi
 ## 📸 The System in Action (Visual Proof)
 
 ### 1. Real-World Utility: Automated WhatsApp Alerts
-*Instead of just logging data to a terminal, our OpenEnv Agent actively integrates with the **Twilio API** to dispatch real-time WhatsApp alerts to municipal authorities the moment illegal dumping is verified.*
+*Instead of just logging data to a terminal, our system integrates with a Node.js backend utilizing **whatsapp-web.js** to dispatch real-time WhatsApp alerts to municipal authorities the moment illegal dumping is verified.*
 
 <img src="https://res.cloudinary.com/dim2u2lq2/image/upload/v1776021008/Screenshot_20260413_003738_cnigc1.jpg" alt="WhatsApp Alert" width="400">
 
@@ -36,7 +36,7 @@ Our system bridges the gap between passive computer vision and active reinforcem
 2. **🤖 RL Framework (Environment):** Built strictly on the **OpenEnv** framework. It manages state transitions and provides sensory inputs to the agent.
 3. **🧠 Reasoning (Policy):** The agent evaluates the spatial risk and uses **LiteLLM proxy** to validate context before executing an action.
 4. **⚡ Action (Communication):** Upon identifying a high-risk dumping event, the agent executes Action 2 (Alert), triggering a localized webhook.
-5. **📲 Dispatch (Utility):** The **Twilio API** formats the payload and sends an instant WhatsApp message with the zone and confidence score.
+5. **📲 Dispatch (Utility):** The **whatsapp-web.js** engine formats the payload and sends an instant WhatsApp message with the zone and confidence score.
 
 ---
 

@@ -18,7 +18,15 @@ router.post('/register', [
     return sendError(res, 400, 'Validation failed', errors.array().map(e => e.msg));
   }
 
-  const { name, email, password, role = 'citizen', ward, phone } = req.body;
+  const { name, email, password, role = 'citizen', phone } = req.body;
+  
+  let ward = req.body.ward;
+  if (ward) {
+    const num = String(ward).replace(/\D/g, '');
+    if (num) {
+      ward = `ward-${num}`;
+    }
+  }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) return sendError(res, 409, 'Email already registered');
@@ -61,10 +69,15 @@ router.get('/me', authenticate, asyncHandler(async (req, res) => {
 
 // PUT /api/auth/profile
 router.put('/profile', authenticate, asyncHandler(async (req, res) => {
-  const { name, phone, ward, fcmToken } = req.body;
+  const updates = {};
+  if (req.body.name !== undefined) updates.name = req.body.name;
+  if (req.body.phone !== undefined) updates.phone = req.body.phone;
+  if (req.body.ward !== undefined) updates.ward = req.body.ward;
+  if (req.body.fcmToken !== undefined) updates.fcmToken = req.body.fcmToken;
+
   const user = await User.findByIdAndUpdate(
     req.user._id,
-    { name, phone, ward, fcmToken },
+    updates,
     { new: true, runValidators: true }
   );
   sendSuccess(res, 200, user, 'Profile updated');

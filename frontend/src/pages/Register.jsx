@@ -17,7 +17,12 @@ export default function Register() {
       const userData = await register(form);
       navigate(userData.role === 'admin' ? '/admin' : '/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed.');
+      const data = err.response?.data;
+      if (data?.errors && data.errors.length > 0) {
+        setError(data.errors.join(', '));
+      } else {
+        setError(data?.message || 'Registration failed.');
+      }
     } finally {
       setLoading(false);
     }

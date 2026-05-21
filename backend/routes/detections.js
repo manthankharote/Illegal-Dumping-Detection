@@ -6,6 +6,7 @@ const Task = require('../models/Task');
 const { authenticate, authorize } = require('../middleware/auth');
 const { emitTaskAssigned } = require('../services/socketService');
 const { emitCCTVDetection } = require('../services/socketService');
+const { isWhatsAppReady, sendWhatsAppAlert } = require('../services/whatsappService');
 const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta } = require('../utils/helpers');
 
 // Middleware: Validate API key for AI service requests
@@ -22,7 +23,7 @@ const validateApiKey = (req, res, next) => {
 router.post('/', validateApiKey, asyncHandler(async (req, res) => {
   const {
     image, imageBase64, latitude, longitude, address, ward,
-    confidence, cameraId, cameraName, detectedObjects, frameCount,
+    confidence, cameraId, cameraName, detectedObjects, frameCount, dumpType
   } = req.body;
 
   if (!latitude || !longitude) return sendError(res, 400, 'Location coordinates are required');
@@ -58,28 +59,52 @@ router.post('/', validateApiKey, asyncHandler(async (req, res) => {
 
   // Send WhatsApp Alerts to Worker and Admin
   try {
-    const { isWhatsAppReady, sendWhatsAppAlert } = require('../services/whatsappService');
     const User = require('../models/User');
 
-    if (isWhatsAppReady()) {
-      const worker = await User.findOne({ ward: detection.ward, role: 'worker' });
-      const admin = await User.findOne({ ward: detection.ward, role: 'admin' });
+    const workers = await User.find({ ward: detection.ward, role: 'worker' });
+    const admins = await User.find({ ward: detection.ward, role: 'admin' });
 
-      const alertMessage = `🚨 *ILLEGAL DUMPING DETECTED*
-📍 Camera: ${detection.cameraName}
-🏘️ Ward: ${detection.ward}
-⚠️ Severity: ${detection.severity}
-🤖 Confidence: ${Math.round(detection.confidence * 100)}%
-🕐 Time: ${new Date().toLocaleString()}
-Please report to location immediately.`;
+    let alertMessage = '';
+    if (dumpType === "LEGAL") {
+      alertMessage = 
+        "✅ *LEGAL DUMPING DETECTED*\n" +
+        "📍 Camera: " + detection.cameraName + "\n" +
+        "🏘️ Ward: " + detection.ward + "\n" +
+        "♻️ Status: Garbage dumped near dustbin (legal)\n" +
+        "🤖 Confidence: " + Math.round(detection.confidence * 100) + "%\n" +
+        "🕐 Time: " + new Date().toLocaleString() + "\n" +
+        "No action needed.";
+    } else {
+      alertMessage = 
+        "🚨 *ILLEGAL DUMPING DETECTED*\n" +
+        "📍 Camera: " + detection.cameraName + "\n" +
+        "🏘️ Ward: " + detection.ward + "\n" +
+        "⚠️ Severity: " + detection.severity + "\n" +
+        "🤖 Confidence: " + Math.round(detection.confidence * 100) + "%\n" +
+        "🕐 Time: " + new Date().toLocaleString() + "\n" +
+        "Please report to location immediately.";
+    }
 
-      if (worker && worker.phone) {
+    console.log('[WHATSAPP DEBUG] Ward:', detection.ward);
+    console.log('[WHATSAPP DEBUG] isWhatsAppReady:', isWhatsAppReady());
+    
+    let workerCount = 0;
+    for (const worker of workers) {
+      if (worker.phone) {
         await sendWhatsAppAlert(worker.phone, alertMessage);
-      }
-      if (admin && admin.phone) {
-        await sendWhatsAppAlert(admin.phone, alertMessage);
+        workerCount++;
       }
     }
+    console.log(`[WHATSAPP DEBUG] Alert queued for ${workerCount} worker(s).`);
+
+    let adminCount = 0;
+    for (const admin of admins) {
+      if (admin.phone) {
+        await sendWhatsAppAlert(admin.phone, alertMessage);
+        adminCount++;
+      }
+    }
+    console.log(`[WHATSAPP DEBUG] Alert queued for ${adminCount} admin(s).`);
   } catch (error) {
     console.error('[ERROR] Failed to dispatch WhatsApp alerts:', error);
   }

@@ -17,6 +17,17 @@ router.post('/', authenticate, upload.single('image'), auditLog('CREATE_REPORT',
     const { latitude, longitude, description, ward, address } = req.body;
     if (!latitude || !longitude) return sendError(res, 400, 'Location coordinates are required');
 
+    // Normalize ward string (e.g. "Ward 2", "Ward-2", or "2" all become "ward-2")
+    let normalizedWard = 'Unassigned';
+    if (ward) {
+      const num = String(ward).replace(/\D/g, '');
+      if (num) {
+        normalizedWard = `ward-${num}`;
+      } else {
+        normalizedWard = ward; // fallback if no number
+      }
+    }
+
     // Send to AI service for detection
     const imagePath = path.join('uploads', req.file.filename);
     const detection = await detectImage(imagePath);
@@ -32,7 +43,7 @@ router.post('/', authenticate, upload.single('image'), auditLog('CREATE_REPORT',
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
       },
       address: address || 'Unknown Location',
-      ward: ward || 'Unassigned',
+      ward: normalizedWard,
       description,
       source: req.body.source || 'citizen',
       reporter: req.user._id,

@@ -3,6 +3,7 @@ import Sidebar from '../../components/Sidebar';
 import MapView from '../../components/MapView';
 import { getReports, getReportStats, getDashboard } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
+import API from '../../services/api';
 
 const sev = { critical: 'badge-critical', high: 'badge-high', medium: 'badge-medium', low: 'badge-low' };
 const statusBadge = { pending: 'badge-pending', assigned: 'badge-assigned', 'in-progress': 'badge-in-progress', completed: 'badge-completed', rejected: 'badge-rejected' };
@@ -14,6 +15,13 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState('');
   const { alerts } = useSocket() || {};
 
+  // Ward staff state
+  const [wardStaff, setWardStaff] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [editingPhones, setEditingPhones] = useState({});
+  const [savingId, setSavingId] = useState(null);
+  const [staffMsg, setStaffMsg] = useState('');
+
   const load = async () => {
     try {
       const [rRes, sRes] = await Promise.all([getReports({ limit: 100 }), getDashboard()]);
@@ -23,7 +31,37 @@ export default function AdminDashboard() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  const loadWardStaff = async () => {
+    setStaffLoading(true);
+    try {
+      const res = await API.get('/users/ward-staff');
+      setWardStaff(res.data.data || []);
+      const phones = {};
+      (res.data.data || []).forEach(s => { phones[s._id] = s.phone || ''; });
+      setEditingPhones(phones);
+    } catch (e) { console.error(e); }
+    finally { setStaffLoading(false); }
+  };
+
+  const savePhone = async (userId) => {
+    const phone = editingPhones[userId];
+    if (!phone || phone.trim() === '') return setStaffMsg('❌ Enter a valid phone number');
+    setSavingId(userId);
+    setStaffMsg('');
+    try {
+      await API.put(`/users/${userId}/phone`, { phone: phone.trim() });
+      setStaffMsg('✅ Phone number updated successfully!');
+      // Refresh staff list
+      await loadWardStaff();
+    } catch (e) {
+      setStaffMsg('❌ Failed to update: ' + (e.response?.data?.message || e.message));
+    } finally {
+      setSavingId(null);
+      setTimeout(() => setStaffMsg(''), 3000);
+    }
+  };
+
+  useEffect(() => { load(); loadWardStaff(); }, []);
 
   // Refresh when new socket alert comes in
   useEffect(() => {
@@ -59,6 +97,87 @@ export default function AdminDashboard() {
               <div className="stat-info"><div className="value">{s.value}</div><div className="label">{s.label}</div></div>
             </div>
           ))}
+        </div>
+
+        {/* Ward Staff Phone Management */}
+        <div className="card" style={{ marginBottom: 20 }}>
+          <div className="flex-between" style={{ marginBottom: 16 }}>
+            <div className="card-title" style={{ marginBottom: 0 }}>📱 WhatsApp Alert Numbers — Ward Staff</div>
+            <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }} onClick={loadWardStaff}>🔄 Reload</button>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 16, marginTop: 0 }}>
+            Manage phone numbers for all workers and admins in your ward. Alerts are sent to every number listed below.
+          </p>
+
+          {staffMsg && (
+            <div style={{
+              padding: '8px 14px', borderRadius: 8, marginBottom: 12,
+              fontSize: '0.85rem', fontWeight: 500,
+              background: staffMsg.startsWith('✅') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+              color: staffMsg.startsWith('✅') ? '#22c55e' : '#ef4444',
+              border: `1px solid ${staffMsg.startsWith('✅') ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+            }}>
+              {staffMsg}
+            </div>
+          )}
+
+          {staffLoading ? (
+            <div className="empty-state"><div className="spinner" /></div>
+          ) : wardStaff.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">👥</div>
+              <p>No staff found in your ward. Register workers and admins with your ward name first.</p>
+            </div>
+          ) : (
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th style={{ minWidth: 180 }}>WhatsApp Number</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {wardStaff.map(person => (
+                    <tr key={person._id}>
+                      <td style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.88rem' }}>
+                        {person.name}
+                      </td>
+                      <td>
+                        <span className={`badge ${person.role === 'admin' ? 'badge-high' : 'badge-medium'}`} style={{ fontSize: '0.75rem' }}>
+                          {person.role === 'admin' ? '🧑‍💼 Admin' : '👷 Worker'}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{person.email}</td>
+                      <td>
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ padding: '6px 10px', fontSize: '0.85rem', height: 34, width: '100%' }}
+                          placeholder="e.g. 9421718269"
+                          value={editingPhones[person._id] || ''}
+                          onChange={e => setEditingPhones(prev => ({ ...prev, [person._id]: e.target.value }))}
+                        />
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-primary"
+                          style={{ padding: '5px 14px', fontSize: '0.78rem', height: 34 }}
+                          disabled={savingId === person._id}
+                          onClick={() => savePhone(person._id)}
+                        >
+                          {savingId === person._id ? '⏳...' : '💾 Save'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Live Alerts Banner */}
