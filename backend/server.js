@@ -31,6 +31,7 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 // Socket.io setup
