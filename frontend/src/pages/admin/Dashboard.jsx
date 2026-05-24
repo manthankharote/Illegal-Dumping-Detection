@@ -3,12 +3,14 @@ import Sidebar from '../../components/Sidebar';
 import MapView from '../../components/MapView';
 import { getReports, getReportStats, getDashboard } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
 import API from '../../services/api';
 
 const sev = { critical: 'badge-critical', high: 'badge-high', medium: 'badge-medium', low: 'badge-low' };
 const statusBadge = { pending: 'badge-pending', assigned: 'badge-assigned', 'in-progress': 'badge-in-progress', completed: 'badge-completed', rejected: 'badge-rejected' };
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [reports, setReports] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
@@ -199,6 +201,40 @@ export default function AdminDashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* CCTV Live Stream Panel (Admins Only) */}
+        {(user?.role === 'admin' || user?.role === 'superadmin') && (
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div className="flex-between" style={{ marginBottom: 16 }}>
+              <div className="card-title" style={{ marginBottom: 0 }}>
+                📹 Live CCTV Surveillance & AI Detection (Team AgniX)
+              </div>
+              <span className="badge badge-high" style={{ background: '#ef4444', color: 'white', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
+                🔴 LIVE
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#0b0f19', borderRadius: 8, padding: 12, border: '1px solid #1e293b' }}>
+              <img 
+                src={`${import.meta.env.VITE_API_URL || '/api'}/cctv/stream?token=${localStorage.getItem('cc_token')}`} 
+                alt="Live AI Surveillance Stream" 
+                style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', borderRadius: 6, border: '1px solid #334155' }} 
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div style={{ display: 'none', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '360px', width: '100%', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '3rem', marginBottom: 16 }}>📹</span>
+                <p style={{ margin: 0, fontWeight: 500 }}>Live stream offline or connecting...</p>
+                <p style={{ margin: '4px 0 0', fontSize: '0.8rem' }}>Make sure your YOLO python script is running.</p>
+              </div>
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', marginTop: 12, fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                <span>🎯 Model: YOLOv11 (Garbage-Detection-Env)</span>
+                <span>📶 Status: Connected to local/AWS proxy</span>
+              </div>
             </div>
           </div>
         )}
