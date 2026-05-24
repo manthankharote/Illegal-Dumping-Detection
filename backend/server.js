@@ -1,5 +1,16 @@
 require('dotenv').config();
 require('dns').setServers(['8.8.8.8']);
+
+// Global handlers to prevent crashes from unhandled library rejections (e.g. WhatsApp EBUSY)
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err.message || err);
+  if (err.stack) console.error(err.stack);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
