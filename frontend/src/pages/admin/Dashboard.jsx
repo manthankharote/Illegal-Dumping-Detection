@@ -17,6 +17,37 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState('');
   const { alerts } = useSocket() || {};
 
+  // CCTV source-switching state
+  const [cctvSource, setCctvSource] = useState('webcam');
+  const [cctvUrl, setCctvUrl] = useState('');
+  const [cctvLoading, setCctvLoading] = useState(false);
+  const [cctvMsg, setCctvMsg] = useState('');
+
+  const handleSwitchSource = async (e) => {
+    e.preventDefault();
+    setCctvLoading(true);
+    setCctvMsg('');
+    try {
+      const res = await API.post('/cctv/config', { source: cctvSource, url: cctvUrl });
+      setCctvMsg('✅ ' + res.data.message);
+      if (cctvSource === 'webcam') setCctvUrl('');
+      
+      // Force refresh the image tag by appending a timestamp to bypass browser caching
+      const img = document.getElementById('cctv-stream-feed');
+      if (img) {
+        const baseUrl = img.src.split('?')[0];
+        img.src = `${baseUrl}?token=${localStorage.getItem('cc_token')}&t=${Date.now()}`;
+        img.style.display = 'block';
+        if (img.nextSibling) img.nextSibling.style.display = 'none';
+      }
+    } catch (err) {
+      setCctvMsg('❌ ' + (err.response?.data?.message || err.message));
+    } finally {
+      setCctvLoading(false);
+      setTimeout(() => setCctvMsg(''), 4000);
+    }
+  };
+
   // Ward staff state
   const [wardStaff, setWardStaff] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
@@ -218,6 +249,7 @@ export default function AdminDashboard() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#0b0f19', borderRadius: 8, padding: 12, border: '1px solid #1e293b' }}>
               <img 
+                id="cctv-stream-feed"
                 src={`${import.meta.env.VITE_API_URL || '/api'}/cctv/stream?token=${localStorage.getItem('cc_token')}`} 
                 alt="Live AI Surveillance Stream" 
                 style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', borderRadius: 6, border: '1px solid #334155' }} 
@@ -236,6 +268,74 @@ export default function AdminDashboard() {
                 <span>📶 Status: Connected to local/AWS proxy</span>
               </div>
             </div>
+
+            {/* Camera Control Panel Form */}
+            <form onSubmit={handleSwitchSource} style={{ width: '100%', marginTop: 16, borderTop: '1px solid #1e293b', paddingTop: 16 }}>
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: 12 }}>
+                ⚙️ Change Camera Stream Source
+              </div>
+              
+              {cctvMsg && (
+                <div style={{
+                  padding: '8px 12px', borderRadius: 6, marginBottom: 12,
+                  fontSize: '0.8rem', fontWeight: 500,
+                  background: cctvMsg.startsWith('✅') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                  color: cctvMsg.startsWith('✅') ? '#22c55e' : '#ef4444',
+                  border: `1px solid ${cctvMsg.startsWith('✅') ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                }}>
+                  {cctvMsg}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1, minWidth: 140 }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 6 }}>Source Type</label>
+                  <select 
+                    className="form-select" 
+                    style={{ width: '100%', height: 36, padding: '4px 10px', fontSize: '0.82rem' }}
+                    value={cctvSource} 
+                    onChange={e => setCctvSource(e.target.value)}
+                  >
+                    <option value="webcam">💻 Local Webcam</option>
+                    <option value="droidcam">📱 DroidCam (IP Camera)</option>
+                    <option value="youtube">📺 YouTube Live Stream</option>
+                    <option value="rtsp">📹 RTSP Feed</option>
+                    <option value="video">📂 Video File</option>
+                  </select>
+                </div>
+
+                {cctvSource !== 'webcam' && (
+                  <div style={{ flex: 2, minWidth: 200 }}>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 6 }}>
+                      {cctvSource === 'youtube' ? 'YouTube Video URL' : cctvSource === 'video' ? 'Video File Path (on host)' : 'Stream URL / IP Address'}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      style={{ width: '100%', height: 36, padding: '6px 12px', fontSize: '0.82rem' }}
+                      placeholder={
+                        cctvSource === 'youtube' ? 'https://www.youtube.com/watch?v=...' 
+                        : cctvSource === 'droidcam' ? 'http://192.168.1.15:4747/video' 
+                        : cctvSource === 'video' ? 'photos/demo.mp4'
+                        : 'rtsp://admin:admin123@192.168.1.100:554/stream1'
+                      }
+                      value={cctvUrl}
+                      onChange={e => setCctvUrl(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+
+                <button 
+                  type="submit" 
+                  className="btn btn-primary" 
+                  style={{ height: 36, padding: '0 20px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                  disabled={cctvLoading}
+                >
+                  {cctvLoading ? '⏳ Applying...' : '⚡ Apply Source'}
+                </button>
+              </div>
+            </form>
           </div>
         )}
 

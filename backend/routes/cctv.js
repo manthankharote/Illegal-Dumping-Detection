@@ -43,4 +43,29 @@ router.get('/stream', authenticate, authorize('admin', 'superadmin'), async (req
   }
 });
 
+/**
+ * @route   POST /api/cctv/config
+ * @desc    Updates the video source on the local Python stream server
+ * @access  Private (Admins & Superadmins only)
+ */
+router.post('/config', authenticate, authorize('admin', 'superadmin'), async (req, res) => {
+  const { source, url } = req.body;
+  const pythonConfigUrl = process.env.PYTHON_CONFIG_URL || 'http://127.0.0.1:7861/switch-source';
+
+  try {
+    const response = await axios.post(pythonConfigUrl, { source, url });
+    if (response.data.success) {
+      res.json({ success: true, message: response.data.message });
+    } else {
+      res.status(400).json({ success: false, message: response.data.message });
+    }
+  } catch (error) {
+    console.error('❌ Failed to update stream configuration:', error.message);
+    res.status(502).json({ 
+      success: false, 
+      message: 'Failed to communicate with internal CCTV streaming engine.' 
+    });
+  }
+});
+
 module.exports = router;

@@ -29,9 +29,34 @@ reconnect_url = None
 # Thread safety lock for frame reading
 frame_lock = threading.Lock()
 
+from pydantic import BaseModel
+
+class SourceSchema(BaseModel):
+    source: str
+    url: str = None
+
 @app.get("/")
 def root():
     return {"status": "online", "message": "YOLO Video Ingestion Engine is running"}
+
+@app.post("/switch-source")
+def switch_source(req: SourceSchema):
+    global cap, reconnect_url
+    source = req.source.lower()
+    url = req.url
+    print(f"[SYSTEM] Request to switch source: {source} | URL: {url}")
+    try:
+        with frame_lock:
+            if cap:
+                cap.release()
+            cap, source_label, reconnect_url = open_source(source, url=url)
+            if not cap.isOpened():
+                raise Exception("Failed to open source stream")
+        print(f"[SYSTEM] Successfully switched to: {source_label}")
+        return {"success": True, "message": f"Successfully switched to {source_label}"}
+    except Exception as e:
+        print(f"[ERROR] Switch source failed: {str(e)}")
+        return {"success": False, "message": str(e)}
 
 def generate_mjpeg_frames():
     global cap, detector, args, reconnect_url
