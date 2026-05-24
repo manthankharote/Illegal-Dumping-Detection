@@ -8,19 +8,27 @@ let isReady = false;
 let messageQueue = [];
 
 // Initialize WhatsApp Client with LocalAuth so session is saved
+const puppeteerArgs = [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage'
+];
+
+// Avoid single-process and other unstable flags on Windows to prevent "Navigating frame was detached" error
+if (process.platform !== 'win32') {
+    puppeteerArgs.push(
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process'
+    );
+}
+
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process'
-        ],
+        args: puppeteerArgs,
     }
 });
 
