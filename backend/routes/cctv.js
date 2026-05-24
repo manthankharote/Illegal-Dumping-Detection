@@ -9,8 +9,8 @@ const { authenticate, authorize } = require('../middleware/auth');
  * @access  Private (Admins & Superadmins only)
  */
 router.get('/stream', authenticate, authorize('admin', 'superadmin'), async (req, res) => {
-  // Internal URL pointing to the local Python FastAPI stream server
-  const pythonStreamUrl = process.env.PYTHON_STREAM_URL || 'http://127.0.0.1:7861/stream';
+  const pythonEngineUrl = process.env.PYTHON_ENGINE_URL || 'http://127.0.0.1:7861';
+  const pythonStreamUrl = `${pythonEngineUrl}/stream`;
 
   try {
     const response = await axios({
@@ -50,7 +50,8 @@ router.get('/stream', authenticate, authorize('admin', 'superadmin'), async (req
  */
 router.post('/config', authenticate, authorize('admin', 'superadmin'), async (req, res) => {
   const { source, url } = req.body;
-  const pythonConfigUrl = process.env.PYTHON_CONFIG_URL || 'http://127.0.0.1:7861/switch-source';
+  const pythonEngineUrl = process.env.PYTHON_ENGINE_URL || 'http://127.0.0.1:7861';
+  const pythonConfigUrl = `${pythonEngineUrl}/switch-source`;
 
   try {
     const response = await axios.post(pythonConfigUrl, { source, url });
