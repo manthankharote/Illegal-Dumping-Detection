@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://illegal-dumping-detection.onrender.com/api/:path*"
+      "destination": "http://13.60.55.85/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://illegal-dumping-detection.onrender.com/uploads/:path*"
+      "destination": "http://13.60.55.85/uploads/:path*"
     },
     {
       "source": "/(.*)",
