@@ -134,7 +134,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="YOLO Video Streaming Server")
     parser.add_argument("--source", default="youtube", choices=["webcam", "droidcam", "rtsp", "youtube", "video"])
-    parser.add_argument("--url", default="https://www.youtube.com/watch?v=1-iS7Z5176A", help="Camera URL or YouTube stream link")
+    parser.add_argument("--url", default="https://www.youtube.com/@LofiGirl/live", help="Camera URL or YouTube stream link")
     parser.add_argument("--file", help="Video file path")
     parser.add_argument("--port", type=int, default=7861, help="FastAPI port")
     args = parser.parse_args()
