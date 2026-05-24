@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://illegal-dumping-detection.onrender.com';
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || window.location.origin;
       const socket = io(socketUrl, { transports: ['websocket'] });
       socketRef.current = socket;
 
