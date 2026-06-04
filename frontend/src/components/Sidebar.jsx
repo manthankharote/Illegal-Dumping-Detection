@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 
 const CITIZEN_NAV = [
-  { to: '/', icon: '🏠', label: 'My Dashboard' },
+  { to: '/citizen', icon: '🏠', label: 'My Dashboard' },
   { to: '/report/new', icon: '📸', label: 'Report Garbage' },
 ];
 

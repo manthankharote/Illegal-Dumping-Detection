@@ -49,4 +49,13 @@ const errorHandler = (err, req, res, next) => {
   sendError(res, err.statusCode || 500, err.message || 'Internal Server Error');
 };
 
-module.exports = { sendSuccess, sendError, paginate, paginateMeta, asyncHandler, errorHandler };
+const normalizeWard = (ward) => {
+  if (!ward) return 'unassigned';
+  const num = String(ward).replace(/\D/g, '');
+  if (num) {
+    return `ward-${num}`;
+  }
+  return String(ward).trim().toLowerCase();
+};
+
+module.exports = { sendSuccess, sendError, paginate, paginateMeta, asyncHandler, errorHandler, normalizeWard };

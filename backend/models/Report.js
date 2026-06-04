@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { normalizeWard } = require('../utils/helpers');
 
 const ReportSchema = new mongoose.Schema({
   image: { type: String, required: true },
@@ -52,5 +53,13 @@ const ReportSchema = new mongoose.Schema({
 ReportSchema.index({ location: '2dsphere' });
 ReportSchema.index({ status: 1, ward: 1 });
 ReportSchema.index({ createdAt: -1 });
+
+// Normalize ward before saving
+ReportSchema.pre('save', function (next) {
+  if (this.isModified('ward') && this.ward) {
+    this.ward = normalizeWard(this.ward);
+  }
+  next();
+});
 
 module.exports = mongoose.model('Report', ReportSchema);

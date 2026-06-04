@@ -9,7 +9,7 @@ const upload = require('../middleware/upload');
 const auditLog = require('../middleware/audit');
 const { emitTaskAssigned, emitTaskCompleted } = require('../services/socketService');
 const { notifyWorkerNewTask } = require('../services/notificationService');
-const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta } = require('../utils/helpers');
+const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta, normalizeWard } = require('../utils/helpers');
 
 // POST /api/tasks - Assign task (admin/superadmin)
 router.post('/', authenticate, authorize('admin', 'superadmin'), auditLog('ASSIGN_TASK', 'Task'),
@@ -52,7 +52,14 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
   const { skip } = paginate({}, page, limit);
 
   let filter = {};
-  if (req.user.role === 'worker') filter.assignedWorker = req.user._id;
+  if (req.user.role === 'worker') {
+    filter.assignedWorker = req.user._id;
+  } else if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    const reportsInWard = await Report.find({ ward: { $in: [ward, 'unassigned'] } }).select('_id');
+    filter.reportId = { $in: reportsInWard.map(r => r._id) };
+  }
+  
   if (status) filter.status = status;
   if (priority) filter.priority = priority;
 
@@ -70,11 +77,19 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
 
 // GET /api/tasks/stats
 router.get('/stats', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  let matchFilter = {};
+  if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    const reportsInWard = await Report.find({ ward: { $in: [ward, 'unassigned'] } }).select('_id');
+    matchFilter.reportId = { $in: reportsInWard.map(r => r._id) };
+  }
+
   const stats = await Task.aggregate([
+    { $match: matchFilter },
     { $group: { _id: '$status', count: { $sum: 1 } } },
   ]);
   const byWorker = await Task.aggregate([
-    { $match: { status: 'completed' } },
+    { $match: { ...matchFilter, status: 'completed' } },
     { $group: { _id: '$assignedWorker', completed: { $sum: 1 } } },
     { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'worker' } },
     { $unwind: '$worker' },

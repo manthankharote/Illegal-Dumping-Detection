@@ -4,21 +4,34 @@ const Report = require('../models/Report');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const { authenticate, authorize } = require('../middleware/auth');
-const { sendSuccess, asyncHandler } = require('../utils/helpers');
+const { sendSuccess, asyncHandler, normalizeWard } = require('../utils/helpers');
 
 // GET /api/analytics/dashboard - Overall stats
 router.get('/dashboard', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  let reportFilter = {};
+  let userFilter = { isActive: true };
+  let taskFilter = {};
+
+  if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    reportFilter.ward = { $in: [ward, 'unassigned'] };
+    userFilter.ward = ward;
+    
+    const reportsInWard = await Report.find({ ward: { $in: [ward, 'unassigned'] } }).select('_id');
+    taskFilter.reportId = { $in: reportsInWard.map(r => r._id) };
+  }
+
   const [totalReports, pendingReports, completedReports, totalUsers, totalTasks, recentReports] = await Promise.all([
-    Report.countDocuments(),
-    Report.countDocuments({ status: 'pending' }),
-    Report.countDocuments({ status: 'completed' }),
-    User.countDocuments({ isActive: true }),
-    Task.countDocuments(),
-    Report.find().sort({ createdAt: -1 }).limit(5).populate('reporter', 'name'),
+    Report.countDocuments(reportFilter),
+    Report.countDocuments({ ...reportFilter, status: 'pending' }),
+    Report.countDocuments({ ...reportFilter, status: 'completed' }),
+    User.countDocuments(userFilter),
+    Task.countDocuments(taskFilter),
+    Report.find(reportFilter).sort({ createdAt: -1 }).limit(5).populate('reporter', 'name'),
   ]);
 
-  const assignedReports = await Report.countDocuments({ status: { $in: ['assigned', 'in-progress'] } });
-  const rejectedReports = await Report.countDocuments({ status: 'rejected' });
+  const assignedReports = await Report.countDocuments({ ...reportFilter, status: { $in: ['assigned', 'in-progress'] } });
+  const rejectedReports = await Report.countDocuments({ ...reportFilter, status: 'rejected' });
 
   sendSuccess(res, 200, {
     totalReports,
@@ -36,7 +49,14 @@ router.get('/dashboard', authenticate, authorize('admin', 'superadmin'), asyncHa
 
 // GET /api/analytics/hotspots - GeoJSON hotspot cluster data
 router.get('/hotspots', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  let matchFilter = {};
+  if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    matchFilter.ward = { $in: [ward, 'unassigned'] };
+  }
+
   const hotspots = await Report.aggregate([
+    { $match: matchFilter },
     {
       $group: {
         _id: {
@@ -83,8 +103,14 @@ router.get('/trends', authenticate, authorize('admin', 'superadmin'), asyncHandl
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - parseInt(days));
 
+  let matchFilter = { createdAt: { $gte: startDate } };
+  if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    matchFilter.ward = { $in: [ward, 'unassigned'] };
+  }
+
   const trends = await Report.aggregate([
-    { $match: { createdAt: { $gte: startDate } } },
+    { $match: matchFilter },
     {
       $group: {
         _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
@@ -96,7 +122,7 @@ router.get('/trends', authenticate, authorize('admin', 'superadmin'), asyncHandl
   ]);
 
   const sourceBreakdown = await Report.aggregate([
-    { $match: { createdAt: { $gte: startDate } } },
+    { $match: matchFilter },
     { $group: { _id: '$source', count: { $sum: 1 } } },
   ]);
 
@@ -105,7 +131,15 @@ router.get('/trends', authenticate, authorize('admin', 'superadmin'), asyncHandl
 
 // GET /api/analytics/workers - Worker performance
 router.get('/workers', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  let matchFilter = {};
+  if (req.user.role === 'admin') {
+    const ward = req.user.ward ? normalizeWard(req.user.ward) : 'unassigned';
+    const reportsInWard = await Report.find({ ward: { $in: [ward, 'unassigned'] } }).select('_id');
+    matchFilter.reportId = { $in: reportsInWard.map(r => r._id) };
+  }
+
   const performance = await Task.aggregate([
+    { $match: matchFilter },
     {
       $group: {
         _id: '$assignedWorker',

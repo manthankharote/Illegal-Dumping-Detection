@@ -15,6 +15,8 @@ import UserManagement from './pages/superadmin/UserManagement';
 import AuditLogs from './pages/superadmin/AuditLogs';
 import LiveAlerts from './pages/admin/LiveAlerts';
 
+import LandingPage from './pages/LandingPage';
+
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="spinner" /><p>Loading…</p></div>;
@@ -28,15 +30,16 @@ const AppRoutes = () => {
   const homeRoute = user?.role === 'superadmin' ? '/superadmin'
     : user?.role === 'admin' ? '/admin'
     : user?.role === 'worker' ? '/admin/tasks'
-    : '/';
+    : '/citizen';
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
       {/* Citizen */}
-      <Route path="/" element={<ProtectedRoute><CitizenDashboard /></ProtectedRoute>} />
+      <Route path="/citizen" element={<ProtectedRoute><CitizenDashboard /></ProtectedRoute>} />
       <Route path="/report/new" element={<ProtectedRoute><NewReport /></ProtectedRoute>} />
 
       {/* Admin + Worker */}

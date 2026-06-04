@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { normalizeWard } = require('../utils/helpers');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -33,6 +34,14 @@ const UserSchema = new mongoose.Schema({
   lastLogin: { type: Date },
   fcmToken: { type: String, default: null },
 }, { timestamps: true });
+
+// Normalize ward before saving
+UserSchema.pre('save', function (next) {
+  if (this.isModified('ward') && this.ward) {
+    this.ward = normalizeWard(this.ward);
+  }
+  next();
+});
 
 // Hash password before saving
 UserSchema.pre('save', async function (next) {

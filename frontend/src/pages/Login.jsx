@@ -18,7 +18,7 @@ export default function Login() {
       const redirect = userData.role === 'superadmin' ? '/superadmin'
         : userData.role === 'admin' ? '/admin'
         : userData.role === 'worker' ? '/admin/tasks'
-        : '/';
+        : '/citizen';
       navigate(redirect);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
