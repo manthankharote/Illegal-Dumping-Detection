@@ -44,6 +44,9 @@ backend/.wwebjs_cache/
 *.jpg
 *.jpeg
 *.png
+!frontend/src/**/*.png
+!frontend/src/**/*.jpg
+!frontend/src/**/*.jpeg
 .ipynb_checkpoints/
 # Sensitive/Private Docs
 demonstration_guide.md
