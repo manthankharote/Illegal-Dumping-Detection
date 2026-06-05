@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Trash2, 
-  Brain, 
-  MapPin, 
-  AlertTriangle, 
-  ShieldAlert, 
-  TrendingUp, 
-  Bell, 
-  UserCheck, 
-  Camera, 
-  Database, 
-  Activity, 
-  ChevronRight, 
-  CheckCircle2, 
-  Clock, 
-  Users, 
-  Globe, 
+import {
+  Trash2,
+  Brain,
+  MapPin,
+  AlertTriangle,
+  ShieldAlert,
+  TrendingUp,
+  Bell,
+  UserCheck,
+  Camera,
+  Database,
+  Activity,
+  ChevronRight,
+  CheckCircle2,
+  Clock,
+  Users,
+  Globe,
   ArrowRight,
   Server,
   Layers,
@@ -74,8 +74,8 @@ export default function LandingPage() {
   };
 
   const handleResolveAlert = (id) => {
-    setMockAlerts(prev => prev.map(alert => 
-      alert.id === id 
+    setMockAlerts(prev => prev.map(alert =>
+      alert.id === id
         ? { ...alert, status: alert.status === 'Pending' ? 'Assigned' : alert.status === 'Assigned' ? 'Completed' : 'Pending' }
         : alert
     ));
@@ -119,7 +119,7 @@ export default function LandingPage() {
         </div>
 
         <div className="hero-content">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -128,7 +128,7 @@ export default function LandingPage() {
             <Brain size={14} /> Next-Gen Civic Intelligence
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
@@ -141,7 +141,7 @@ export default function LandingPage() {
             </div>
           </motion.h1>
 
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -153,7 +153,7 @@ export default function LandingPage() {
             </span>
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -169,7 +169,7 @@ export default function LandingPage() {
         </div>
 
         {/* Floating Mockup Dashboard */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}
@@ -252,7 +252,7 @@ export default function LandingPage() {
                         </div>
                         <span className="badge badge-critical">AI DETECTING</span>
                       </div>
-                      
+
                       <div className="cctv-feed-simulator">
                         <img src={cctvWasteFeed} alt="Simulated AI detection feed" className="cctv-img" />
                         <div className="cctv-overlay">
@@ -297,15 +297,14 @@ export default function LandingPage() {
                               </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span className={`badge ${
-                                alert.status === 'Pending' ? 'badge-pending' : alert.status === 'Assigned' ? 'badge-assigned' : 'badge-completed'
-                              }`} style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
+                              <span className={`badge ${alert.status === 'Pending' ? 'badge-pending' : alert.status === 'Assigned' ? 'badge-assigned' : 'badge-completed'
+                                }`} style={{ fontSize: '0.65rem', padding: '2px 8px' }}>
                                 {alert.status}
                               </span>
                               {alert.status !== 'Completed' && (
-                                <button 
+                                <button
                                   onClick={() => handleResolveAlert(alert.id)}
-                                  className="btn btn-primary btn-sm" 
+                                  className="btn btn-primary btn-sm"
                                   style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: '4px' }}
                                 >
                                   {alert.status === 'Pending' ? 'Assign Worker' : 'Mark Done'}
@@ -339,7 +338,7 @@ export default function LandingPage() {
                         <div className="map-road" style={{ top: '180px', left: 0, width: '100%', height: '20px' }} />
                         <div className="map-road" style={{ top: 0, left: '120px', width: '16px', height: '100%' }} />
                         <div className="map-road" style={{ top: 0, left: '380px', width: '22px', height: '100%' }} />
-                        
+
                         {/* Heatmap glowing dots */}
                         <div className="heat-glow high" style={{ top: '25%', left: '18%' }} />
                         <div className="heat-glow med" style={{ top: '65%', left: '55%' }} />
@@ -365,9 +364,9 @@ export default function LandingPage() {
                           fontSize: '0.65rem'
                         }}>
                           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Legend</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-red)' }}/> High Density Spot</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-orange)' }}/> Medium Density Spot</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }}/> Cleaned Area</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-red)' }} /> High Density Spot</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-orange)' }} /> Medium Density Spot</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }} /> Cleaned Area</div>
                         </div>
                       </div>
                     </motion.div>
@@ -394,7 +393,7 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -413,7 +412,7 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -432,7 +431,7 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -451,7 +450,7 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -470,7 +469,7 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -497,26 +496,23 @@ export default function LandingPage() {
       <section id="solution" className="landing-section" style={{ background: 'var(--bg-secondary)' }}>
         <div className="section-container">
           <div className="section-header">
-            <span className="section-label" style={{ color: 'var(--accent-green)' }}>Our Workflow / आमची कार्यपद्धती</span>
-            <h2 className="section-title">Our Smart Solution / आमचे स्मार्ट सोल्युशन</h2>
+            <span className="section-label" style={{ color: 'var(--accent-green)' }}>Our Workflow</span>
+            <h2 className="section-title">Our Smart Solution</h2>
             <p className="section-subtitle">
               Bridging the gap between computer vision detection and field action. Here is how our automated agent closes the loop on civic cleanliness.
-              <span style={{ display: 'block', marginTop: '6px', fontSize: '0.92rem', opacity: 0.85 }}>
-                कॉम्प्युटर व्हिजनद्वारे कचरा शोधणे आणि त्यावर प्रत्यक्ष कारवाई करणे यातील अंतर कमी करून, आमची यंत्रणा संपूर्ण स्वच्छता प्रक्रिया कशी स्वयंचलित करते ते पहा.
-              </span>
             </p>
           </div>
 
           <div className="workflow-grid">
             {[
-              { num: '1', title: 'Upload Image / फोटो अपलोड', desc: 'Citizen uploads an image of the dumping site or CCTV stream observes it. / नागरिक कचऱ्याचा फोटो अपलोड करतात किंवा सीसीटीव्ही कॅमेरा तो टिपतो.' },
-              { num: '2', title: 'AI Detection / AI द्वारे शोध', desc: 'Custom YOLOv11 computer vision models classify waste type and estimate size. / आमचे YOLOv11 मॉडेल कचऱ्याचा प्रकार आणि प्रमाण आपोआप शोधते.' },
-              { num: '3', title: 'GPS Tagging / स्थान निश्चिती', desc: 'Incident coordinates are immediately captured and mapped to the nearest ward. / कचऱ्याच्या जागेचे भौगोलिक स्थान (GPS) आपोआप ट्रॅक केले जाते.' },
-              { num: '4', title: 'Authority Alert / त्वरित अलर्ट', desc: 'Express API dispatches live socket alerts and WhatsApp updates to ward officers. / वॉर्ड अधिकाऱ्याला डॅशबोर्डवर आणि व्हॉट्सॲपवर लगेच अलर्ट मेसेज पाठवला जातो.' },
-              { num: '5', title: 'Crew Assigned / टीमची नियुक्ती', desc: 'Task system assigns the closest cleaning crew with exact route optimizations. / सर्वात जवळच्या स्वच्छता कर्मचाऱ्याला काम सोपवून अचूक मार्ग दाखवला जातो.' },
-              { num: '6', title: 'Issue Resolved / समस्या निवारण', desc: 'Sanitation team uploads clean-up proof. The dashboard updates and tracks completion. / कचरा उचलल्यावर टीम फोटो अपलोड करते आणि तक्रार बंद होते.' },
+              { num: '1', title: 'Upload Image', desc: 'Citizen uploads an image of the dumping site or CCTV stream observes it.' },
+              { num: '2', title: 'AI Detection', desc: 'Custom YOLOv11 computer vision models classify waste type and estimate size.' },
+              { num: '3', title: 'GPS Tagging', desc: 'Incident coordinates are immediately captured and mapped to the nearest ward.' },
+              { num: '4', title: 'Authority Alert', desc: 'Express API dispatches live socket alerts and WhatsApp updates to ward officers.' },
+              { num: '5', title: 'Crew Assigned', desc: 'Task system assigns the closest cleaning crew with exact route optimizations.' },
+              { num: '6', title: 'Issue Resolved', desc: 'Sanitation team uploads clean-up proof. The dashboard updates and tracks completion.' },
             ].map((step, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 viewport={{ once: true }}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -554,7 +550,7 @@ export default function LandingPage() {
               { icon: <TrendingUp />, title: 'Analytics & Reports', desc: 'Generates comprehensive charts detailing average resolution time, ward cleanliness ranks, and hotspot trends.' },
               { icon: <Bell />, title: 'Smart Notifications', desc: 'Connects directly with mobile. Sends automated WhatsApp alerts with image attachments and location pins to supervisors.' }
             ].map((feature, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 viewport={{ once: true }}
                 initial={{ opacity: 0, y: 15 }}
@@ -591,7 +587,7 @@ export default function LandingPage() {
 
           <div className="dashboard-grid-mock">
             {/* Panel 1: Live CCTV Simulator */}
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -632,7 +628,7 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Panel 2: Stats & Prediction mockup */}
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -652,35 +648,35 @@ export default function LandingPage() {
                     <span style={{ fontWeight: 'bold' }}>Resolution Efficiency Trend</span>
                     <span className="text-green">+14.2% This Month</span>
                   </div>
-                  
+
                   {/* Fake SVG Bar Chart */}
                   <svg viewBox="0 0 300 100" style={{ width: '100%', height: '90px' }}>
                     {/* Gridlines */}
                     <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,0.05)" />
                     <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(255,255,255,0.05)" />
                     <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,0.05)" />
-                    
+
                     {/* Area path */}
-                    <path 
-                      d="M0 90 Q 50 70, 100 50 T 200 40 T 300 20 L 300 100 L 0 100 Z" 
-                      fill="url(#chart-glow)" 
+                    <path
+                      d="M0 90 Q 50 70, 100 50 T 200 40 T 300 20 L 300 100 L 0 100 Z"
+                      fill="url(#chart-glow)"
                     />
                     {/* Line path */}
-                    <path 
-                      d="M0 90 Q 50 70, 100 50 T 200 40 T 300 20" 
-                      fill="none" 
-                      stroke="var(--accent-green)" 
-                      strokeWidth="3" 
+                    <path
+                      d="M0 90 Q 50 70, 100 50 T 200 40 T 300 20"
+                      fill="none"
+                      stroke="var(--accent-green)"
+                      strokeWidth="3"
                     />
-                    
+
                     <defs>
                       <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--accent-green)" stopOpacity="0.3"/>
-                        <stop offset="100%" stopColor="var(--accent-green)" stopOpacity="0.0"/>
+                        <stop offset="0%" stopColor="var(--accent-green)" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="var(--accent-green)" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
                   </svg>
-                  
+
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '8px' }}>
                     <span>Week 1</span>
                     <span>Week 2</span>
@@ -749,7 +745,7 @@ export default function LandingPage() {
               { icon: <Server className="tech-icon" />, title: 'Cloud Infrastructure', desc: 'High availability Node.js cluster backed by MongoDB Atlas storage.' },
               { icon: <TrendingUp className="tech-icon" style={{ color: 'var(--accent-green)' }} />, title: 'Real-Time Analytics', desc: 'Bidirectional WebSockets and WhatsApp hook integrations pushing alerts immediately.' },
             ].map((tech, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 viewport={{ once: true }}
                 initial={{ opacity: 0, y: 15 }}
@@ -772,7 +768,7 @@ export default function LandingPage() {
       <section id="about" className="landing-section" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--glass-border)' }}>
         <div className="section-container">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '50px', alignItems: 'center' }}>
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -788,12 +784,12 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               viewport={{ once: true }}
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="glass-card" 
+              className="glass-card"
               style={{ borderLeft: '4px solid var(--accent-green)' }}
             >
               <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '16px' }}>Supporting Municipal Corporations</h3>
