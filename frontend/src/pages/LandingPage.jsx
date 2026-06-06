@@ -31,7 +31,7 @@ export default function LandingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('cctv'); // 'cctv', 'reports', 'heatmap'
-  const [theme, setTheme] = useState(() => localStorage.getItem('cleancity-theme') || 'dark');
+  const [theme, setTheme] = useState(() => localStorage.getItem('agnix-theme') || 'dark');
   const [mockAlerts, setMockAlerts] = useState([
     { id: 1, location: 'Ward 4 - Town Hall', severity: 'critical', status: 'Pending', time: '2m ago' },
     { id: 2, location: 'Ward 12 - Railway Station', severity: 'high', status: 'Assigned', time: '12m ago' },
@@ -41,7 +41,7 @@ export default function LandingPage() {
   // Keep track of theme shifts from global toggle
   useEffect(() => {
     const handleStorageChange = () => {
-      setTheme(localStorage.getItem('cleancity-theme') || 'dark');
+      setTheme(localStorage.getItem('agnix-theme') || 'dark');
     };
     window.addEventListener('storage', handleStorageChange);
     // Periodically sync theme in case of local updates
@@ -86,7 +86,7 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="landing-nav">
         <Link to="/" className="nav-brand">
-          <h2>🏙️ CleanCity</h2>
+          <h2>🤖 AgniX</h2>
         </Link>
         <ul className="nav-links">
           <li><span onClick={() => handleScrollTo('problem')} className="nav-link">Problem</span></li>
@@ -134,10 +134,10 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="hero-title"
           >
-            Transforming City Cleanliness with <br />
-            <span className="gradient-text-green">AI-Powered Waste Management</span>
+            Autonomous AI Agent for <br />
+            <span className="gradient-text-green">Illegal Dumping Detection & Evidence Collection</span>
             <div style={{ fontSize: '1.8rem', fontWeight: 600, marginTop: '12px', opacity: 0.9 }}>
-              AI-आधारित कचरा व्यवस्थापनाद्वारे शहर स्वच्छता परिवर्तन
+              बेकायदेशीर कचरा टाकणे शोधणे आणि पुरावा गोळा करण्यासाठी स्वायत्त एआय एजंट
             </div>
           </motion.h1>
 
@@ -147,9 +147,9 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="hero-subtitle"
           >
-            Helping Municipal Corporations detect, track, and resolve illegal garbage dumping through Artificial Intelligence, Computer Vision, and Real-Time Monitoring.
+            Empowering municipal corporations with real-time YOLOv11 surveillance, autonomous environmental logic, and instant WhatsApp dispatch alerts with irrefutable evidence.
             <span style={{ display: 'block', marginTop: '8px', fontSize: '0.98rem', opacity: 0.85, fontWeight: 500 }}>
-              कृत्रिम बुद्धिमत्ता (AI), कॉम्प्युटर व्हिजन आणि रिअल-टाइम मॉनिटरिंगद्वारे महानगरपालिकांना कचऱ्याचे बेकायदेशीर ढीग शोधण्यात, ट्रॅक करण्यात आणि त्याचे निवारण करण्यात मदत करणे.
+              यलोव्ह११ (YOLOv11) रिअल-टाइम सर्वेक्षण, स्वायत्त निर्णय प्रणाली आणि संपूर्ण पुराव्यासह त्वरित व्हॉट्सॲप सूचनांद्वारे महानगरपालिकांना सक्षम करणे.
             </span>
           </motion.p>
 
@@ -181,7 +181,7 @@ export default function LandingPage() {
               <div className="dot yellow" />
               <div className="dot green" />
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: '12px', fontFamily: 'monospace' }}>
-                cleancity-ai-dashboard.gov
+                agnix-ai-dashboard.gov
               </span>
             </div>
             <div className="mockup-body">
@@ -189,7 +189,7 @@ export default function LandingPage() {
               <div className="mockup-sidebar">
                 <div style={{ paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)', marginBottom: '16px' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-green)' }}>
-                    🏙️ CleanCity Admin
+                    🤖 AgniX Admin
                   </div>
                   <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
                     SECURE MUNICIPAL PORTAL
@@ -730,7 +730,7 @@ export default function LandingPage() {
         <div className="section-container">
           <div className="section-header">
             <span className="section-label">State-of-the-Art Stack</span>
-            <h2 className="section-title">The Technology Behind CleanCity</h2>
+            <h2 className="section-title">The Technology Behind AgniX</h2>
             <p className="section-subtitle">
               We leverage modern frameworks, cloud architectures, and machine learning models to deploy real-time civic solutions.
             </p>
@@ -777,7 +777,7 @@ export default function LandingPage() {
               <span className="section-label" style={{ color: 'var(--accent-green)' }}>Our Mission</span>
               <h2 className="section-title" style={{ fontSize: '2.4rem' }}>Supporting Smart City Initiatives Everywhere</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7', marginBottom: '20px' }}>
-                CleanCity AI is committed to helping municipal corporations transition from passive, reactive cleanup schedules to proactive, AI-informed enforcement and rapid sanitization workflows.
+                AgniX AI is committed to helping municipal corporations transition from passive, reactive cleanup schedules to proactive, AI-informed enforcement and rapid sanitization workflows.
               </p>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>
                 By equipping city administrators with live geographic alerts, automated WhatsApp dispatch systems, and worker tracking interfaces, we turn CCTV cameras and citizen phones into an active defense against environmental decay.
@@ -812,7 +812,7 @@ export default function LandingPage() {
       <footer className="landing-footer">
         <div className="footer-grid">
           <div className="footer-brand">
-            <h3>🏙️ CleanCity</h3>
+            <h3>🤖 AgniX</h3>
             <p>Empowering municipal corporations with computer vision and smart dispatch systems to build healthier, cleaner, and more sustainable cities.</p>
           </div>
           <div>
@@ -835,14 +835,14 @@ export default function LandingPage() {
           </div>
           <div className="footer-newsletter">
             <h4 className="footer-heading">Smart City Command</h4>
-            <p>Connect with our technical integration team to deploy CleanCity AI in your municipal ward.</p>
+            <p>Connect with our technical integration team to deploy AgniX AI in your municipal ward.</p>
             <Link to="/register" className="btn btn-primary btn-sm" style={{ width: '100%', justifyContent: 'center' }}>
               Register Ward
             </Link>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} CleanCity AI. Developed for Swachh Bharat & Smart Cities.</p>
+          <p>© {new Date().getFullYear()} AgniX AI. Developed for Swachh Bharat & Smart Cities.</p>
           <p>Designed with 💚 for Chhatrapati Sambhajinagar</p>
         </div>
       </footer>

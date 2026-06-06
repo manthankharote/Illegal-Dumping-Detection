@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('cleancity-theme') || 'dark';
+    return localStorage.getItem('agnix-theme') || 'dark';
   });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('cleancity-theme', theme);
+    localStorage.setItem('agnix-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

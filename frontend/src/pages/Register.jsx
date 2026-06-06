@@ -37,7 +37,7 @@ export default function Register() {
       <div className="auth-left">
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🏙️</div>
-          <div className="brand-title">CleanCity AI</div>
+          <div className="brand-title">AgniX AI</div>
           <div style={{ 
             fontSize: '2.8rem', 
             fontWeight: 800, 

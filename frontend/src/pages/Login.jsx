@@ -17,8 +17,8 @@ export default function Login() {
       const userData = await login(form.email, form.password);
       const redirect = userData.role === 'superadmin' ? '/superadmin'
         : userData.role === 'admin' ? '/admin'
-        : userData.role === 'worker' ? '/admin/tasks'
-        : '/citizen';
+          : userData.role === 'worker' ? '/admin/tasks'
+            : '/citizen';
       navigate(redirect);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -29,10 +29,10 @@ export default function Login() {
 
   const fillDemo = (role) => {
     const creds = {
-      superadmin: { email: 'superadmin@cleancity.com', password: 'admin123' },
-      admin: { email: 'admin@cleancity.com', password: 'admin123' },
-      worker: { email: 'worker@cleancity.com', password: 'admin123' },
-      citizen: { email: 'citizen@cleancity.com', password: 'admin123' },
+      superadmin: { email: 'superadmin@agnix.com', password: 'admin123' },
+      admin: { email: 'admin@agnix.com', password: 'admin123' },
+      worker: { email: 'worker@agnix.com', password: 'admin123' },
+      citizen: { email: 'citizen@agnix.com', password: 'admin123' },
     };
     setForm(creds[role]);
   };
@@ -42,10 +42,10 @@ export default function Login() {
       <div className="auth-left">
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🏙️</div>
-          <div className="brand-title">CleanCity AI</div>
-          <div style={{ 
-            fontSize: '2.8rem', 
-            fontWeight: 800, 
+          <div className="brand-title">Cleancity AI</div>
+          <div style={{
+            fontSize: '2.8rem',
+            fontWeight: 800,
             marginTop: '-16px',
             marginBottom: '16px',
             background: 'linear-gradient(135deg, var(--accent-green), var(--accent-cyan))',
@@ -77,7 +77,7 @@ export default function Login() {
       <div className="auth-right">
         <div className="auth-box">
           <h2>Welcome back 👋</h2>
-          <p className="subtitle">Sign in to your CleanCity account</p>
+          <p className="subtitle">Sign in to your AgniX account</p>
 
           {error && (
             <div className="toast error" style={{ marginBottom: '16px', position: 'relative', animation: 'none' }}>

@@ -69,8 +69,8 @@ export default function Sidebar() {
 
       <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <h1>🏙️ CleanCity</h1>
-          <span>AI Waste Surveillance</span>
+          <h1>🤖 AgniX</h1>
+          <span>AI Dumping Surveillance</span>
           <div style={{ 
             fontSize: '1.3rem', 
             fontWeight: 800, 
