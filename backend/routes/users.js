@@ -3,7 +3,27 @@ const router = express.Router();
 const User = require('../models/User');
 const { authenticate, authorize } = require('../middleware/auth');
 const auditLog = require('../middleware/audit');
-const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta } = require('../utils/helpers');
+const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta, normalizeWard } = require('../utils/helpers');
+
+// GET /api/users/available-wards - Get all wards that have active staff or exist in reports
+router.get('/available-wards', authenticate, asyncHandler(async (req, res) => {
+  const userWards = await User.distinct('ward', { ward: { $nin: [null, 'all', 'unassigned'] } });
+  const Report = require('../models/Report');
+  const reportWards = await Report.distinct('ward', { ward: { $nin: [null, 'unassigned'] } });
+  
+  const allWards = Array.from(new Set([...userWards, ...reportWards]));
+  const defaultWards = ['ward-1', 'ward-2', 'ward-3', 'ward-4'];
+  const finalWards = allWards.length > 0 ? allWards : defaultWards;
+
+  const formatted = finalWards.map(w => {
+    const num = w.replace(/\D/g, '');
+    return num ? `Ward-${num}` : w.charAt(0).toUpperCase() + w.slice(1);
+  });
+
+  formatted.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+  sendSuccess(res, 200, formatted, 'Available wards fetched');
+}));
 
 // GET /api/users - List all users (superadmin)
 router.get('/', authenticate, authorize('superadmin'), asyncHandler(async (req, res) => {
@@ -11,7 +31,7 @@ router.get('/', authenticate, authorize('superadmin'), asyncHandler(async (req, 
   const { skip } = paginate({}, page, limit);
   const filter = {};
   if (role) filter.role = role;
-  if (ward) filter.ward = ward;
+  if (ward) filter.ward = normalizeWard(ward);
 
   const total = await User.countDocuments(filter);
   const users = await User.find(filter)
@@ -48,15 +68,15 @@ router.put('/:id/deactivate', authenticate, authorize('superadmin'), auditLog('D
 router.get('/workers', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
   const { ward } = req.query;
   const filter = { role: 'worker', isActive: true };
-  if (ward) filter.ward = ward;
+  if (ward) filter.ward = normalizeWard(ward);
   const workers = await User.find(filter).sort({ name: 1 });
   sendSuccess(res, 200, workers, 'Workers fetched');
 }));
 
 // GET /api/users/ward-staff - Get all workers + admins in logged-in admin's ward
 router.get('/ward-staff', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
-  const ward = req.user.ward;
-  if (!ward) return sendError(res, 400, 'No ward assigned to your account');
+  const ward = normalizeWard(req.user.ward);
+  if (!ward || ward === 'unassigned') return sendError(res, 400, 'No ward assigned to your account');
 
   const staff = await User.find({ 
     ward, 
@@ -76,7 +96,7 @@ router.put('/:id/phone', authenticate, authorize('admin', 'superadmin'), asyncHa
   const targetUser = await User.findById(req.params.id);
   if (!targetUser) return sendError(res, 404, 'User not found');
   
-  if (req.user.role === 'admin' && targetUser.ward !== req.user.ward) {
+  if (req.user.role === 'admin' && normalizeWard(targetUser.ward) !== normalizeWard(req.user.ward)) {
     return sendError(res, 403, 'You can only update staff in your own ward');
   }
 

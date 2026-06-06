@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { generateToken, authenticate } = require('../middleware/auth');
 const auditLog = require('../middleware/audit');
-const { sendSuccess, sendError, asyncHandler } = require('../utils/helpers');
+const { sendSuccess, sendError, asyncHandler, normalizeWard } = require('../utils/helpers');
 
 // POST /api/auth/register
 router.post('/register', [
@@ -20,13 +20,7 @@ router.post('/register', [
 
   const { name, email, password, role = 'citizen', phone } = req.body;
   
-  let ward = req.body.ward;
-  if (ward) {
-    const num = String(ward).replace(/\D/g, '');
-    if (num) {
-      ward = `ward-${num}`;
-    }
-  }
+  const ward = req.body.ward ? normalizeWard(req.body.ward) : undefined;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) return sendError(res, 409, 'Email already registered');
@@ -72,7 +66,7 @@ router.put('/profile', authenticate, asyncHandler(async (req, res) => {
   const updates = {};
   if (req.body.name !== undefined) updates.name = req.body.name;
   if (req.body.phone !== undefined) updates.phone = req.body.phone;
-  if (req.body.ward !== undefined) updates.ward = req.body.ward;
+  if (req.body.ward !== undefined) updates.ward = req.body.ward ? normalizeWard(req.body.ward) : null;
   if (req.body.fcmToken !== undefined) updates.fcmToken = req.body.fcmToken;
 
   const user = await User.findByIdAndUpdate(

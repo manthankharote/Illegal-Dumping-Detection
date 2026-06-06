@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { normalizeWard } = require('../utils/helpers');
 
 const DetectionSchema = new mongoose.Schema({
   image: { type: String, default: '' },
@@ -54,5 +55,13 @@ DetectionSchema.index({ location: '2dsphere' });
 DetectionSchema.index({ status: 1, severity: 1 });
 DetectionSchema.index({ cameraId: 1, createdAt: -1 });
 DetectionSchema.index({ createdAt: -1 });
+
+// Normalize ward before saving
+DetectionSchema.pre('save', function (next) {
+  if (this.isModified('ward') && this.ward) {
+    this.ward = normalizeWard(this.ward);
+  }
+  next();
+});
 
 module.exports = mongoose.model('Detection', DetectionSchema);

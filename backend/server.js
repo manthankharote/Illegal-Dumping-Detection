@@ -35,8 +35,61 @@ const auditRoutes = require('./routes/audit');
 const detectionRoutes = require('./routes/detections');
 const cctvRoutes = require('./routes/cctv');
 
-// Connect DB
-connectDB();
+// Connect DB and run migrations
+connectDB().then(async () => {
+  try {
+    const User = require('./models/User');
+    const Report = require('./models/Report');
+    const Detection = require('./models/Detection');
+    const { normalizeWard } = require('./utils/helpers');
+
+    console.log('🔄 Running automated ward normalization migration...');
+
+    // Migration for Users
+    const users = await User.find({ ward: { $ne: null } });
+    let updatedUsersCount = 0;
+    for (const user of users) {
+      const normalized = normalizeWard(user.ward);
+      if (user.ward !== normalized) {
+        user.ward = normalized;
+        await user.save({ validateBeforeSave: false });
+        updatedUsersCount++;
+      }
+    }
+
+    // Migration for Reports
+    const reports = await Report.find({ ward: { $ne: null } });
+    let updatedReportsCount = 0;
+    for (const report of reports) {
+      const normalized = normalizeWard(report.ward);
+      if (report.ward !== normalized) {
+        report.ward = normalized;
+        await report.save({ validateBeforeSave: false });
+        updatedReportsCount++;
+      }
+    }
+
+    // Migration for Detections
+    const detections = await Detection.find({ ward: { $ne: null } });
+    let updatedDetectionsCount = 0;
+    for (const detection of detections) {
+      const normalized = normalizeWard(detection.ward);
+      if (detection.ward !== normalized) {
+        detection.ward = normalized;
+        await detection.save({ validateBeforeSave: false });
+        updatedDetectionsCount++;
+      }
+    }
+
+    if (updatedUsersCount > 0 || updatedReportsCount > 0 || updatedDetectionsCount > 0) {
+      console.log(`✅ Ward normalization migration finished. Updated ${updatedUsersCount} users, ${updatedReportsCount} reports, ${updatedDetectionsCount} detections.`);
+    } else {
+      console.log('✅ Ward normalization migration finished. All records are already normalized.');
+    }
+  } catch (err) {
+    console.error('❌ Ward normalization migration error:', err.message);
+  }
+});
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');

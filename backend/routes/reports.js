@@ -7,7 +7,7 @@ const upload = require('../middleware/upload');
 const auditLog = require('../middleware/audit');
 const { detectImage } = require('../services/aiService');
 const { emitNewAlert } = require('../services/socketService');
-const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta } = require('../utils/helpers');
+const { sendSuccess, sendError, asyncHandler, paginate, paginateMeta, normalizeWard } = require('../utils/helpers');
 
 // POST /api/reports - Submit a report (citizen or CCTV)
 router.post('/', authenticate, upload.single('image'), auditLog('CREATE_REPORT', 'Report'),
@@ -17,16 +17,8 @@ router.post('/', authenticate, upload.single('image'), auditLog('CREATE_REPORT',
     const { latitude, longitude, description, ward, address } = req.body;
     if (!latitude || !longitude) return sendError(res, 400, 'Location coordinates are required');
 
-    // Normalize ward string (e.g. "Ward 2", "Ward-2", or "2" all become "ward-2")
-    let normalizedWard = 'Unassigned';
-    if (ward) {
-      const num = String(ward).replace(/\D/g, '');
-      if (num) {
-        normalizedWard = `ward-${num}`;
-      } else {
-        normalizedWard = ward; // fallback if no number
-      }
-    }
+    // Normalize ward string using the centralized helper
+    const normalizedWard = normalizeWard(ward);
 
     // Send to AI service for detection
     const imagePath = path.join('uploads', req.file.filename);
@@ -72,14 +64,18 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
   if (req.user.role === 'citizen') {
     filter.reporter = req.user._id;
   } else if (req.user.role === 'admin') {
-    if (req.user.ward) filter.ward = req.user.ward;
+    if (req.user.ward) {
+      filter.ward = { $in: [normalizeWard(req.user.ward), 'unassigned'] };
+    } else {
+      filter.ward = 'unassigned';
+    }
   } else if (req.user.role === 'worker') {
     filter.assignedTo = req.user._id;
   }
   // superadmin sees all
 
   if (status) filter.status = status;
-  if (ward && req.user.role !== 'citizen') filter.ward = ward;
+  if (ward && req.user.role !== 'citizen') filter.ward = normalizeWard(ward);
   if (source) filter.source = source;
   if (severity) filter.severity = severity;
 
@@ -106,16 +102,28 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
 
 // GET /api/reports/stats – aggregated stats
 router.get('/stats', authenticate, authorize('admin', 'superadmin'), asyncHandler(async (req, res) => {
+  let filter = {};
+  if (req.user.role === 'admin') {
+    if (req.user.ward) {
+      filter.ward = { $in: [normalizeWard(req.user.ward), 'unassigned'] };
+    } else {
+      filter.ward = 'unassigned';
+    }
+  }
+
   const stats = await Report.aggregate([
+    { $match: filter },
     { $group: { _id: '$status', count: { $sum: 1 }, avgConfidence: { $avg: '$detectionConfidence' } } },
   ]);
   const bySeverity = await Report.aggregate([
+    { $match: filter },
     { $group: { _id: '$severity', count: { $sum: 1 } } },
   ]);
   const bySource = await Report.aggregate([
+    { $match: filter },
     { $group: { _id: '$source', count: { $sum: 1 } } },
   ]);
-  const total = await Report.countDocuments();
+  const total = await Report.countDocuments(filter);
   sendSuccess(res, 200, { total, byStatus: stats, bySeverity, bySource }, 'Stats fetched');
 }));
 

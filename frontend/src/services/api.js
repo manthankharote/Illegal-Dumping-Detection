@@ -53,6 +53,7 @@ export const getWorkerPerformance = () => API.get('/analytics/workers');
 export const getWardStats = () => API.get('/analytics/wards');
 
 // Users
+export const getAvailableWards = () => API.get('/users/available-wards');
 export const getUsers = (params) => API.get('/users', { params });
 export const getWorkers = (params) => API.get('/users/workers', { params });
 export const updateUserRole = (id, role) => API.put(`/users/${id}/role`, { role });

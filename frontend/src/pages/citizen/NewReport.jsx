@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
-import { createReport } from '../../services/api';
+import { createReport, getAvailableWards } from '../../services/api';
 
 export default function NewReport() {
   const navigate = useNavigate();
@@ -15,6 +15,19 @@ export default function NewReport() {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState('');
   const [dragging, setDragging] = useState(false);
+  const [wards, setWards] = useState([]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      try {
+        const res = await getAvailableWards();
+        setWards(res.data.data || []);
+      } catch (e) {
+        console.error('Failed to load wards:', e);
+      }
+    };
+    fetchWards();
+  }, []);
 
   const handleFile = (f) => {
     if (!f) return;
@@ -43,6 +56,7 @@ export default function NewReport() {
     e.preventDefault();
     if (!file) return setError('Please select an image');
     if (!location.lat) return setError('Please capture your location first');
+    if (!form.ward) return setError('Please select a ward');
     setError('');
     setSubmitting(true);
 
@@ -151,8 +165,11 @@ export default function NewReport() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Ward</label>
-                  <input className="form-input" placeholder="e.g., Ward-1"
-                    value={form.ward} onChange={e => setForm(p => ({ ...p, ward: e.target.value }))} />
+                  <select className="form-select" style={{ height: 42 }}
+                    value={form.ward} onChange={e => setForm(p => ({ ...p, ward: e.target.value }))}>
+                    <option value="">Select Ward</option>
+                    {wards.map(w => <option key={w} value={w}>{w}</option>)}
+                  </select>
                 </div>
               </div>
             </div>
