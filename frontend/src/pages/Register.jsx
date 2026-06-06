@@ -15,7 +15,11 @@ export default function Register() {
     setLoading(true);
     try {
       const userData = await register(form);
-      navigate(userData.role === 'admin' ? '/admin' : '/');
+      const redirect = userData.role === 'superadmin' ? '/superadmin'
+        : userData.role === 'admin' ? '/admin'
+        : userData.role === 'worker' ? '/admin/tasks'
+        : '/citizen';
+      navigate(redirect);
     } catch (err) {
       const data = err.response?.data;
       if (data?.errors && data.errors.length > 0) {
